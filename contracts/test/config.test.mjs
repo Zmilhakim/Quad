@@ -59,19 +59,35 @@ test("an address of Quadpad's own is accepted", () => {
   assert.equal(result.out, "0x1111111111111111111111111111111111111111");
 });
 
-test("the committed config supplies neither, so a deploy cannot inherit one", () => {
-  // Nothing is deployed, and the two keys have to be made on somebody's own
-  // machine — so the honest state of this file is empty, and every script that
-  // needs an address says so rather than quietly defaulting to one.
+test("the committed config carries two addresses, and they are Quadpad's", () => {
   const config = loadConfig();
-  assert.equal(config.treasury, "");
-  assert.equal(config.deployer, "");
 
+  // Both are set, both resolve, and — the point of all of this — neither is
+  // the address Tollpad pays. `configAddress` returns them checksummed, and
+  // the file holds them in exactly that form, so a diff of this file is a
+  // review of the real value rather than of a spelling of it.
   for (const path of ["treasury", "deployer"]) {
     const result = resolve(path, "NOTHING_SET_HERE", undefined);
-    assert.equal(result.ok, false, `${path} resolved to something despite being empty`);
-    assert.match(result.why, /is not set in quadpad\.config\.json/);
+    assert.equal(result.ok, true, `${path} does not resolve:\n${result.why}`);
+    assert.equal(result.out, config[path], `${path} in the file is not the checksummed form`);
   }
+
+  assert.notEqual(config.treasury.toLowerCase(), TOLLPAD_TREASURY.toLowerCase());
+  assert.notEqual(config.deployer.toLowerCase(), TOLLPAD_DEPLOYER.toLowerCase());
+
+  // And they are two addresses rather than one typed twice. The deployer signs
+  // and can be discarded afterwards; the treasury is paid forever and should
+  // not be a key that signs anything else.
+  assert.notEqual(config.treasury.toLowerCase(), config.deployer.toLowerCase());
+});
+
+test("an address the config does not have is refused, not defaulted", () => {
+  // Nothing under `deployed` yet, so this is a path that exists in shape and
+  // holds nothing. A missing address has to stop a script rather than resolve
+  // to something.
+  const result = resolve("deployed.factory", "NOTHING_SET_HERE", undefined);
+  assert.equal(result.ok, false, "a missing address resolved to something");
+  assert.match(result.why, /is not set in quadpad\.config\.json/);
 });
 
 test("a mistyped address fails its checksum rather than pointing somewhere real", () => {

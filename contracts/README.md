@@ -190,8 +190,8 @@ there:
 {
   "chainId": 4663,
   "poolManager": "0x8366a39CC670B4001A1121B8F6A443A643e40951",
-  "treasury": "",          // where the treasury's 20% goes, forever
-  "deployer": "",          // the address that deploys — its address, not its key
+  "treasury": "0x956c367FE043D30B5aF2bAc70460221BD989578C",
+  "deployer": "0x87439efCB3B6959fe7E9Da6b9F23196FfC626790",
   "deployed": { }          // deploy.mjs fills this in
 }
 ```
@@ -203,13 +203,12 @@ keep that promise in a config file.
 
 ### Quadpad's two addresses are Quadpad's own
 
-Both are empty, and they stay empty until somebody generates them on their own
-machine. They are **not** Tollpad's.
-
-That is enforced rather than asked for. An earlier commit carried Tollpad's two
-addresses over wholesale with a note saying to change them before deploying —
-and a note is not a check. `configAddress` now refuses either of them outright,
-in any spelling, and `test/config.test.mjs` asserts it:
+They are **not** Tollpad's, and that is enforced rather than asked for. An
+earlier commit carried Tollpad's two over wholesale with a note saying to change
+them before deploying — and a note is not a check. `configAddress` refuses
+either of them outright, in any spelling, and `test/config.test.mjs` asserts
+both that and the fact that the two addresses above are distinct from each
+other:
 
 ```
 treasury is Tollpad's treasury: 0xb1A81E4A729c87560eF12d7652D883e803C5422E
@@ -219,10 +218,16 @@ you sit in front of — `node new-wallets.mjs`, which refuses to run on a
 hosted machine — and put them in quadpad.config.json.
 ```
 
+Neither key was generated here, and neither can be: `new-wallets.mjs` refuses to
+run on a hosted or shared machine, because a private key is only secret while it
+has existed in exactly one place.
+
 The treasury matters most: it is an `immutable` in the hook from `npm run
 deploy` onwards, so the moment before deploying is the last moment it can be
 changed at all. Paid to the wrong address, every fee the treasury side ever
-earns goes there and no function anywhere moves it.
+earns goes there and no function anywhere moves it. **Check both addresses
+against the source you generated them from before running `npm run deploy`** —
+the checksum catches a mistyped character, not a correctly-typed wrong address.
 
 Addresses are public and belong in a file that gets reviewed in a diff rather
 than retyped at a prompt — `treasury` in particular, since it is immutable from

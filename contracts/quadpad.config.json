@@ -2,9 +2,9 @@
   "$comment": "Addresses are public. Private keys never go in this file, or any file in this repo.",
   "chainId": 4663,
   "poolManager": "0x8366a39CC670B4001A1121B8F6A443A643e40951",
-  "$treasury": "Quadpad's own, not Tollpad's. Generate both with `node new-wallets.mjs` on the computer you sit in front of — it refuses to run on a hosted machine, and configAddress refuses Tollpad's two addresses outright. The treasury is immutable in the hook from `npm run deploy` onwards.",
-  "treasury": "",
-  "deployer": "",
+  "$treasury": "Quadpad's own, not Tollpad's — configAddress refuses Tollpad's two outright. `treasury` becomes an immutable in QuadHook from `npm run deploy` onwards and no function anywhere moves it, so this is the last moment it can be changed.",
+  "treasury": "0x956c367FE043D30B5aF2bAc70460221BD989578C",
+  "deployer": "0x87439efCB3B6959fe7E9Da6b9F23196FfC626790",
   "$launch": "Nothing to configure. The opening price, the range and the tick spacing are constants in QuadpadFactory.sol — see OPENING_TICK.",
   "deployed": {}
 }

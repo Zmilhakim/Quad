@@ -81,23 +81,28 @@ simply started, which is the order it was meant to happen in.
 
 ## Before it can be deployed
 
-`contracts/quadpad.config.json` has no `treasury` and no `deployer`, and it will
-not get them from here. Both are Quadpad's own — not Tollpad's — and both have
-to be generated on the machine their owner sits in front of:
+`contracts/quadpad.config.json` carries Quadpad's own two addresses — not
+Tollpad's:
 
-```bash
-cd contracts && node new-wallets.mjs
-```
+| | |
+| --- | --- |
+| Treasury | `0x956c367FE043D30B5aF2bAc70460221BD989578C` |
+| Deployer | `0x87439efCB3B6959fe7E9Da6b9F23196FfC626790` |
 
-That script refuses to run on a hosted or shared machine, and so does this
-session: a private key is only secret while it has existed in exactly one place,
-and a container someone else can read is not that place.
+Neither key exists in this repository or in any session that wrote it. They are
+made with `node new-wallets.mjs` in `contracts/`, which refuses to run on a
+hosted or shared machine: a private key is only secret while it has existed in
+exactly one place, and a container somebody else can read is not that place. The
+keys reach the scripts through `DEPLOYER_KEY` in a shell, one session at a time.
 
 An earlier commit carried Tollpad's two addresses over with a note asking
 whoever deployed to change them. `configAddress` now refuses both by name, in
-any spelling, and `contracts/test/config.test.mjs` asserts it — because the
-treasury becomes an `immutable` in the hook the moment `npm run deploy` runs,
-and there is no function anywhere that moves it afterwards.
+any spelling, and `contracts/test/config.test.mjs` asserts that — and that these
+two are distinct from each other — because the treasury becomes an `immutable`
+in the hook the moment `npm run deploy` runs, and there is no function anywhere
+that moves it afterwards.
+
+Then: fund the deployer with a little ETH, `npm run mine`, `npm run deploy`.
 
 > Not audited and not deployed. `contracts/quadpad.config.json` has nothing under
 > `deployed`, the site has no `NEXT_PUBLIC_FACTORY_ADDRESS`, and both say so
