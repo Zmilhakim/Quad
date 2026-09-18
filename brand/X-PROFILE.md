@@ -66,29 +66,38 @@ One thing to leave out of all of them: **a number nobody can check yet**. No
 "$2M locked", no "1,000 launches", no APR. Everything above is true of a
 launchpad on its first day, which is the day the bio gets written.
 
-## What is not checkable yet, and what to do about it
+## The claims in this bio are checkable
 
 Tollpad's bio makes two claims — 5% and 80% — and both are constants with no
-setter in `TollHook.sol`, so anyone can go and read them. Quadpad has no
-contracts yet. The brand was drawn first, on purpose, and that means **every
-number in this file is a specification rather than a fact about deployed code.**
+setter in `TollHook.sol`, so anyone can go and read them. Every claim in the bios
+above is the same kind of thing:
 
-So, before this bio goes up anywhere:
+| The bio says | Read it in |
+| --- | --- |
+| 4% of every swap | `FEE_BPS` in `../contracts/src/QuadHook.sol` |
+| 80% of it to the launcher | `CREATOR_BPS`, same file |
+| A billion tokens | `FIXED_SUPPLY` in `QuadpadFactory.sol` |
+| Opens at 1.7 ETH | `OPENING_TICK`, same file — and `openingMarketCap()`, which derives the figure from it |
+| Liquidity locked for good | `QuadLocker.sol`, which has no function that takes any out |
 
-- The four numbers live in [`numbers.mjs`](numbers.mjs) — 400 bps, 8000 bps, one
-  billion, 1.7 ETH. `assertAgainstContracts()` there already knows how to read
-  `FEE_BPS`, `CREATOR_BPS`, `FIXED_SUPPLY` and `LP_FEE` out of
-  `../contracts/src/`, and to refuse the render if they disagree or if
-  `QuadLocker.sol` grows a way to take liquidity back out. It reports
-  `checked: false` until those files exist, and the render prints that line
-  rather than hiding it.
-- Until then, the honest version of "liquidity locked for good" is a promise
-  about what will be deployed, not a description of what is. Posting it as the
-  latter is the same mistake as printing a domain you have not registered.
+[`numbers.mjs`](numbers.mjs) reads all of them on every render and refuses to
+draw art that disagrees with the contracts. There is nothing in this file that
+rests on trusting whoever wrote it.
 
-This repository has made that mistake once already: Hoodpad shipped a banner
-printing `HOODPAD.FUN` and `@HOODPAD` when neither was registered. The rule that
-came out of it is below, and it is the same rule.
+Two things the bio still cannot claim, and does not:
+
+- **Nothing is deployed.** The contracts exist and are tested against Uniswap's
+  own pool manager; they are not on Robinhood Chain and they are not audited. A
+  bio describing a launchpad in the present tense is describing something people
+  can go and use — so say "not deployed yet" in the pinned post rather than
+  leaving anyone to find out.
+- **No number nobody can check.** No "$2M locked", no launch count, no APR.
+  Everything above is true of a launchpad on its first day, which is the day the
+  bio gets written.
+
+For the handle and the website field, the rule below is the same one this
+repository already broke once: Hoodpad shipped a banner printing `HOODPAD.FUN`
+and `@HOODPAD` when neither was registered.
 
 ## "Opens at 1.7 ETH" means priced, not funded
 

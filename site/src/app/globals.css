@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+@theme {
+  /* The ground: a drafting table, not a road. Tollpad is asphalt because a toll
+     is something you pay at a barrier; this launchpad's claim is that every
+     launch is the same measured thing, and measured things get drawn on a
+     grid. */
+  --color-ground: #101826;
+  --color-ground-deep: #080d16;
+  --color-ground-soft: #17202f;
+  --color-ground-lift: #1f2a3b;
+
+  /* Signal: the green a number goes when it is settled. The one colour allowed
+     to shout, and the only one that means "this is the figure". */
+  --color-signal: #3ee08b;
+  --color-signal-deep: #1f9c5c;
+
+  /* The rule the sheet is ruled with. */
+  --color-rule: #243349;
+
+  /* Paper and ink, for the few surfaces that are light. */
+  --color-paper: #eef2f7;
+  --color-paper-dim: #dbe3ee;
+  --color-ink: #080d16;
+  --color-ink-soft: #5d6b80;
+
+  /* On the dark ground, "ink" would be invisible — these are the text tones. */
+  --color-lane: #eef2f7;
+  --color-lane-soft: #98a5b8;
+  --color-lane-faint: #6d7c91;
+
+  --color-rust: #e0703e;
+  --color-go: #3ee08b;
+
+  --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-ground);
+    /* The same ruled sheet the banner is printed on. */
+    background-image:
+      linear-gradient(var(--color-rule) 1px, transparent 1px),
+      linear-gradient(90deg, var(--color-rule) 1px, transparent 1px);
+    background-size: 25px 25px;
+    color: var(--color-lane);
+    font-family: var(--font-mono);
+    margin: 0;
+  }
+
+  ::selection {
+    background-color: var(--color-signal);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-signal);
+    outline-offset: 2px;
+  }
+}
+
+@utility hazard {
+  /* The edge of the sheet: a measured rule, the way the banner starts. */
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--color-signal) 0px,
+    var(--color-signal) 12px,
+    transparent 12px,
+    transparent 25px
+  );
+}
+
+@utility micro {
+  font-size: 0.6875rem;
+  line-height: 1.1rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+@utility drop {
+  box-shadow: 4px 4px 0 0 var(--color-ground-deep);
+}
+
+@utility drop-sm {
+  box-shadow: 2px 2px 0 0 var(--color-ground-deep);
+}
+
+@keyframes drift {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@utility drifting {
+  animation: drift 42s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drifting {
+    animation: none;
+  }
+}

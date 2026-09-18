@@ -20,7 +20,7 @@ export const PALETTE = {
   warn: "#e0703e",
 };
 
-const SIZE = 12;
+export const SIZE = 12;
 
 /**
  * The mark is the numeral four.
@@ -35,7 +35,7 @@ const SIZE = 12;
  * triangle of empty space the diagonal closes — stays open at small sizes
  * instead of silting up into a blob.
  */
-const FOUR = [
+export const FOUR = [
   "............",
   ".......##...",
   "......###...",
