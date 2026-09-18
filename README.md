@@ -79,6 +79,26 @@ carried the code that would read them out of the contracts once there were any.
 The contracts have since landed and **none of the art changed** — the checking
 simply started, which is the order it was meant to happen in.
 
+## Before it can be deployed
+
+`contracts/quadpad.config.json` has no `treasury` and no `deployer`, and it will
+not get them from here. Both are Quadpad's own — not Tollpad's — and both have
+to be generated on the machine their owner sits in front of:
+
+```bash
+cd contracts && node new-wallets.mjs
+```
+
+That script refuses to run on a hosted or shared machine, and so does this
+session: a private key is only secret while it has existed in exactly one place,
+and a container someone else can read is not that place.
+
+An earlier commit carried Tollpad's two addresses over with a note asking
+whoever deployed to change them. `configAddress` now refuses both by name, in
+any spelling, and `contracts/test/config.test.mjs` asserts it — because the
+treasury becomes an `immutable` in the hook the moment `npm run deploy` runs,
+and there is no function anywhere that moves it afterwards.
+
 > Not audited and not deployed. `contracts/quadpad.config.json` has nothing under
 > `deployed`, the site has no `NEXT_PUBLIC_FACTORY_ADDRESS`, and both say so
 > rather than rendering a board of zeros that looks like a board nobody has used.

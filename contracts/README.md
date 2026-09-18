@@ -168,7 +168,10 @@ only a *changed* one between mining and sending is, and `deploy.mjs` mines it
 itself to make that impossible.
 
 **Treasury.** Receives 20% of every fee, forever, and is an `immutable` in the
-hook. There is no setter under any spelling. `deploy.mjs` reads it back off the
+hook. There is no setter under any spelling. It is **not** the address Tollpad
+pays — `configAddress` refuses that one by name, because the two configs are one
+directory apart and identical in shape, which is exactly how a copy-paste
+nobody re-reads becomes permanent. `deploy.mjs` reads it back off the
 chain after deploying and refuses to go on if it is not the address that was
 asked for. It has to be an address that can call `withdraw` — a contract that
 cannot make that call can never be paid — and it should be a hardware wallet
@@ -187,8 +190,8 @@ there:
 {
   "chainId": 4663,
   "poolManager": "0x8366a39CC670B4001A1121B8F6A443A643e40951",
-  "treasury": "0xb1A8…",   // where the treasury's 20% goes, forever
-  "deployer": "0xF914…",   // the address that deploys — its address, not its key
+  "treasury": "",          // where the treasury's 20% goes, forever
+  "deployer": "",          // the address that deploys — its address, not its key
   "deployed": { }          // deploy.mjs fills this in
 }
 ```
@@ -198,10 +201,28 @@ range and the tick spacing are constants in `QuadpadFactory.sol`, not settings.
 A launchpad whose one promise is "every launch opens at the same price" cannot
 keep that promise in a config file.
 
-The `treasury` and `deployer` here were carried over from Tollpad, because it is
-the same hands. The treasury is **immutable from `npm run deploy` onwards** — if
-this launchpad should pay somewhere else, change it before deploying, not
-after.
+### Quadpad's two addresses are Quadpad's own
+
+Both are empty, and they stay empty until somebody generates them on their own
+machine. They are **not** Tollpad's.
+
+That is enforced rather than asked for. An earlier commit carried Tollpad's two
+addresses over wholesale with a note saying to change them before deploying —
+and a note is not a check. `configAddress` now refuses either of them outright,
+in any spelling, and `test/config.test.mjs` asserts it:
+
+```
+treasury is Tollpad's treasury: 0xb1A81E4A729c87560eF12d7652D883e803C5422E
+
+Quadpad deploys with its own two addresses. Generate them on the computer
+you sit in front of — `node new-wallets.mjs`, which refuses to run on a
+hosted machine — and put them in quadpad.config.json.
+```
+
+The treasury matters most: it is an `immutable` in the hook from `npm run
+deploy` onwards, so the moment before deploying is the last moment it can be
+changed at all. Paid to the wrong address, every fee the treasury side ever
+earns goes there and no function anywhere moves it.
 
 Addresses are public and belong in a file that gets reviewed in a diff rather
 than retyped at a prompt — `treasury` in particular, since it is immutable from
