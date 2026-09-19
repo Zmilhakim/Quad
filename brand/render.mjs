@@ -299,7 +299,7 @@ const liveCard = `<!doctype html><html><head><meta charset="utf-8">${FONTS}<styl
 
       <div style="padding:22px 48px;border-top:3px solid ${PALETTE.signal};background:${PALETTE.groundDeep}">
         <div style="font-size:20px;line-height:1.55;color:${PALETTE.paper};max-width:96ch">
-          Read them rather than take this card's word for it. Open the locker and search it for a withdraw, a collect, or a negative liquidity delta — there is none. Open the hook and read ${RATE.fee} and ${RATE.creator} as constants with no setter. Not audited.
+          Read them rather than take this card's word for it. Open the locker and search it for a withdraw, a collect, or a negative liquidity delta — there is none. Open the hook and read ${RATE.fee} and ${RATE.creator} as constants with no setter. All four verified on Blockscout, exact match. Not audited.
         </div>
         <div style="margin-top:14px;display:flex;justify-content:space-between;align-items:center">
           <span class="micro" style="color:${PALETTE.signal};font-weight:600">SUPPLY ${RATE.supply}, ALL OF IT IN THE POOL</span>
