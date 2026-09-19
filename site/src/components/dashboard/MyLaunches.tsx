@@ -53,7 +53,7 @@ export function MyLaunches() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {notices.map((notice) => (
-            <LaunchCard key={String(notice.id)} notice={notice} state={states.get(notice.token.toLowerCase())} />
+            <LaunchCard key={String(notice.id)} notice={notice} state={states.get(notice.token.toLowerCase())} hook={hook} />
           ))}
         </div>
       )}

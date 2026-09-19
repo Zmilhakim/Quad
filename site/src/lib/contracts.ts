@@ -4,9 +4,10 @@ import { isAddress } from "viem";
 import { quadpadFactoryAbi } from "./abi/quadpadFactory";
 import { quadHookAbi } from "./abi/quadHook";
 import { quadLockerAbi } from "./abi/quadLocker";
+import { quadRouterAbi } from "./abi/quadRouter";
 import { quadTokenAbi } from "./abi/quadToken";
 
-export { quadpadFactoryAbi, quadHookAbi, quadLockerAbi, quadTokenAbi };
+export { quadpadFactoryAbi, quadHookAbi, quadLockerAbi, quadRouterAbi, quadTokenAbi };
 
 /**
  * The factory, on Robinhood Chain since 19 September 2026.
@@ -31,6 +32,33 @@ export const FACTORY_ADDRESS: Address | undefined = isAddress(configured, { stri
 
 /** Whether there is anything on chain to read. */
 export const BOARD_IS_OPEN = FACTORY_ADDRESS !== undefined;
+
+/**
+ * The router, on Robinhood Chain since 19 September 2026.
+ *
+ * Nothing on this site could buy anything before it existed: a v4 pool has no
+ * swap a wallet can call, so a launched token is unbuyable until a contract
+ * that answers `unlockCallback` is deployed in front of it. It is separate from
+ * the factory deliberately — the launchpad is immutable, this is a window onto
+ * it, and NEXT_PUBLIC_ROUTER_ADDRESS can point at a better one without anything
+ * else changing.
+ */
+const DEPLOYED_ROUTER = "0xB5F0EC10C79cB2301faA0D6BBdbb884B869A9e14";
+
+const configuredRouter = process.env.NEXT_PUBLIC_ROUTER_ADDRESS?.trim() || DEPLOYED_ROUTER;
+
+export const ROUTER_ADDRESS: Address | undefined = isAddress(configuredRouter, { strict: false })
+  ? (configuredRouter as Address)
+  : undefined;
+
+/** Whether anything on the board can be traded from here. */
+export const TRADING_IS_OPEN = ROUTER_ADDRESS !== undefined;
+
+/** How far the price may move between the quote and the block, before the swap reverts. */
+export const SLIPPAGE_BPS = 100n;
+
+/** How long a swap may sit unmined before it is refused. */
+export const DEADLINE_SECONDS = 900;
 
 /** Uniswap v4 on Robinhood Chain, from Uniswap's deployment record for 4663. */
 export const POOL_MANAGER = "0x8366a39CC670B4001A1121B8F6A443A643e40951" as Address;

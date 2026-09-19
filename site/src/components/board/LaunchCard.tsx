@@ -3,6 +3,7 @@ import type { Address } from "viem";
 
 import { Badge } from "@/components/ui/Badge";
 import { TokenImage } from "./TokenImage";
+import { TradePanel } from "./TradePanel";
 import { explorerAddress } from "@/lib/chain";
 import type { Notice } from "@/lib/contracts";
 import { formatEth, formatTokenAmount, shortAddress, timeAgo } from "@/lib/format";
@@ -17,7 +18,15 @@ import { ethInPosition, tokensInPosition } from "@/lib/ticks";
  * price for says so rather than showing a zero — that state should be
  * impossible, which is exactly why it is worth printing when it happens.
  */
-export function LaunchCard({ notice, state }: { notice: Notice; state?: Slot0 }) {
+export function LaunchCard({
+  notice,
+  state,
+  hook,
+}: {
+  notice: Notice;
+  state?: Slot0;
+  hook?: Address;
+}) {
   const priced = state?.initialized ?? false;
 
   const eth = priced ? ethInPosition(notice.liquidity, state!.sqrtPriceX96, notice.tickLower, notice.tickUpper) : null;
@@ -102,6 +111,10 @@ export function LaunchCard({ notice, state }: { notice: Notice; state?: Slot0 })
           4% fee · liquidity locked
         </Link>
       </div>
+
+      {/* A pool with no price cannot be quoted, so there is nothing honest to
+          put here until the manager has one. */}
+      {priced && <TradePanel notice={notice} hook={hook} />}
     </article>
   );
 }
