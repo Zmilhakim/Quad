@@ -14,6 +14,7 @@
 // against a launch that never happened.
 import { createWalletClient, formatEther, formatGwei, http, parseEventLogs } from "viem";
 
+import { relaunchCommand } from "./lib/command.mjs";
 import { configAddress, loadConfig } from "./lib/config.mjs";
 import { connect, fail, requireDeployerKey, requireEnv } from "./lib/env.mjs";
 import { readArtifact } from "./lib/artifacts.mjs";
@@ -139,7 +140,10 @@ try {
 
 if (process.env.CONFIRM !== "launch") {
   console.log(`\nNothing was sent. To send it:\n`);
-  console.log(`    NAME="${params.name}" SYMBOL="${params.symbol}" CONFIRM=launch npm run launch`);
+  console.log(`    ${relaunchCommand(params)}`);
+  console.log(`\nThat line carries every field above. The picture, the blurb and the link are`);
+  console.log(`written into the notice by the launch and by nothing else afterwards, so a`);
+  console.log(`shorter line is not a shorter way to do the same thing.`);
   process.exit(0);
 }
 
