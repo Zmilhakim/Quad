@@ -9,18 +9,19 @@ import { quadTokenAbi } from "./abi/quadToken";
 export { quadpadFactoryAbi, quadHookAbi, quadLockerAbi, quadTokenAbi };
 
 /**
- * The factory, once there is one.
- *
- * Nothing is deployed yet, so this is empty and the site says so on every page
- * rather than rendering a board of nothing that looks like a board with nothing
- * on it. `npm run deploy` in ../contracts prints the address; put it here, or in
- * NEXT_PUBLIC_FACTORY_ADDRESS, and the whole site turns on.
+ * The factory, on Robinhood Chain since 19 September 2026.
  *
  * It is written here rather than only in a dashboard variable because a
  * deployment that forgets a variable does not fail — it quietly builds a page
- * telling visitors the launchpad does not exist.
+ * telling visitors the launchpad does not exist. NEXT_PUBLIC_FACTORY_ADDRESS
+ * still overrides it, for pointing a preview at something else.
+ *
+ * The hook is at 0x490Dcc9e85Bc775C4dD4A1444dB57FD4089b20CC and the locker at
+ * 0xF258eC8Ca9f8896cE320cb16E7C0300fA4D2c3bB; the site reads both off the
+ * factory rather than holding its own copy, so there is nothing here to fall
+ * out of step with the chain.
  */
-const DEPLOYED_FACTORY = "";
+const DEPLOYED_FACTORY = "0x4A5C4578470E17eB287483b4CEc90d6082bb901a";
 
 const configured = process.env.NEXT_PUBLIC_FACTORY_ADDRESS?.trim() || DEPLOYED_FACTORY;
 

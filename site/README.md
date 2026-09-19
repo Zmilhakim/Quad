@@ -20,12 +20,16 @@ npm run build
 | `/dashboard` | What this address launched, and the fee it is owed |
 | `/learn` | The mechanism, and the parts worth being clear-eyed about |
 
-## It works before anything is deployed
+## It worked before anything was deployed, and the wiring stayed
 
-`NEXT_PUBLIC_FACTORY_ADDRESS` is empty, so the site builds and runs and says on
-every page that nothing is deployed yet. That is deliberate: a board of zeros
-looks exactly like a board nobody has used, and the difference matters. Set the
-address — after `npm run deploy` in `../contracts` — and every page turns on.
+`DEPLOYED_FACTORY` in `src/lib/contracts.ts` now holds the factory, so every
+page reads the chain. Before it did, the site built and ran and said on every
+page that nothing was deployed — deliberately, because a board of zeros looks
+exactly like a board nobody has used, and the difference matters.
+
+That branch is still there and still correct: empty the constant and the banner
+comes back. `NEXT_PUBLIC_FACTORY_ADDRESS` overrides the constant, for pointing a
+preview somewhere else.
 
 ```bash
 cp .env.example .env.local
@@ -86,10 +90,10 @@ already taken by somebody else. Vercel picks a suffix rather than failing, and
 this file records what it picked — a URL nobody wrote down is a URL that gets
 guessed wrong later.
 
-What is still unset, on purpose: **`NEXT_PUBLIC_FACTORY_ADDRESS`**. There are no
-contracts on Robinhood Chain yet, so the live site says so on every page. Deploy
-them with `npm run deploy` in `../contracts`, set the variable in the project's
-environment, and redeploy — the pages turn on with no code change.
+**`NEXT_PUBLIC_FACTORY_ADDRESS`** is unset, and stays that way: the factory is
+in `src/lib/contracts.ts` instead, so a deployment cannot forget it. A variable
+that goes missing does not fail the build — it quietly serves a page telling
+visitors the launchpad does not exist.
 
 Set **`NEXT_PUBLIC_RPC_URL`** before this sees any real traffic. The default
 endpoint is Robinhood's public one and is rate-limited for wallets, not for a

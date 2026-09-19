@@ -10,9 +10,10 @@ site/       the web app: landing, board, launch form, dashboard
 brand/      logo, avatar, banner, OG image and launch card, all generated
 ```
 
-The app is live at **https://quadpad-phi.vercel.app**, built from `main`. It
-reads an empty board and says so, because the contracts below are not deployed
-yet.
+The app is live at **https://quadpad-phi.vercel.app**, built from `main`, and
+the contracts are on Robinhood Chain. The board is empty because nobody has
+launched anything yet — the site reads that from the chain rather than
+describing it.
 
 ## The shape
 
@@ -108,8 +109,20 @@ two are distinct from each other — because the treasury becomes an `immutable`
 in the hook the moment `npm run deploy` runs, and there is no function anywhere
 that moves it afterwards.
 
-Then: fund the deployer with a little ETH, `npm run mine`, `npm run deploy`.
+That is done. The addresses are under `deployed` in
+[`contracts/quadpad.config.json`](contracts/quadpad.config.json):
 
-> Not audited and not deployed. `contracts/quadpad.config.json` has nothing under
-> `deployed`, the site has no `NEXT_PUBLIC_FACTORY_ADDRESS`, and both say so
-> rather than rendering a board of zeros that looks like a board nobody has used.
+| | |
+| --- | --- |
+| Factory | `0x4A5C4578470E17eB287483b4CEc90d6082bb901a` |
+| Hook | `0x490Dcc9e85Bc775C4dD4A1444dB57FD4089b20CC` |
+| Locker | `0xF258eC8Ca9f8896cE320cb16E7C0300fA4D2c3bB` |
+
+The deploy script read all three back off the chain before it would record
+them, checked the hook landed on an address carrying its flags, and checked the
+hook holds the treasury that was asked for. The treasury is an `immutable` from
+that transaction onwards.
+
+> **Not audited.** The contracts are readable, and tested against Uniswap's own
+> pool manager rather than a model of it, which is not the same thing as
+> audited. Nothing has been launched on the board yet.

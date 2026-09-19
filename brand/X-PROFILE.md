@@ -84,13 +84,16 @@ above is the same kind of thing:
 draw art that disagrees with the contracts. There is nothing in this file that
 rests on trusting whoever wrote it.
 
-Two things the bio still cannot claim, and does not:
+The contracts are on Robinhood Chain now, so the bio can be read in the present
+tense: there is a launchpad at
+`0x4A5C4578470E17eB287483b4CEc90d6082bb901a` that anyone can post to.
 
-- **Nothing is deployed.** The contracts exist and are tested against Uniswap's
-  own pool manager; they are not on Robinhood Chain and they are not audited. A
-  bio describing a launchpad in the present tense is describing something people
-  can go and use — so say "not deployed yet" in the pinned post rather than
-  leaving anyone to find out.
+Two things it still cannot claim, and does not:
+
+- **It is not audited.** The contracts are readable and tested against Uniswap's
+  own pool manager, which is not the same thing as audited. Deployed is not
+  audited, and a pinned post is the place to say so rather than leaving anyone
+  to find out.
 - **No number nobody can check.** No "$2M locked", no launch count, no APR.
   Everything above is true of a launchpad on its first day, which is the day the
   bio gets written.

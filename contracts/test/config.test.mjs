@@ -82,12 +82,33 @@ test("the committed config carries two addresses, and they are Quadpad's", () =>
 });
 
 test("an address the config does not have is refused, not defaulted", () => {
-  // Nothing under `deployed` yet, so this is a path that exists in shape and
-  // holds nothing. A missing address has to stop a script rather than resolve
-  // to something.
-  const result = resolve("deployed.factory", "NOTHING_SET_HERE", undefined);
+  // A path that exists in shape and holds nothing. A missing address has to
+  // stop a script rather than resolve to something.
+  //
+  // This used to point at `deployed.factory`, which was empty until the
+  // launchpad was deployed — and the day it was filled, this test failed rather
+  // than quietly testing nothing, which is the whole reason it names a key that
+  // is never going to be written.
+  const result = resolve("deployed.nothing", "NOTHING_SET_HERE", undefined);
   assert.equal(result.ok, false, "a missing address resolved to something");
   assert.match(result.why, /is not set in quadpad\.config\.json/);
+});
+
+test("the recorded deployment is three distinct addresses, stored checksummed", () => {
+  const { deployed } = loadConfig();
+
+  // `deploy.mjs` reads all three back off the chain before writing them here,
+  // so what this checks is the record rather than the chain: that it is
+  // complete, that it is in the form `configAddress` hands back, and that no
+  // two of them are the same address typed twice.
+  for (const key of ["factory", "hook", "locker"]) {
+    const result = resolve(`deployed.${key}`, "NOTHING_SET_HERE", undefined);
+    assert.equal(result.ok, true, `deployed.${key} does not resolve:\n${result.why}`);
+    assert.equal(result.out, deployed[key], `deployed.${key} is not stored in its checksummed form`);
+  }
+
+  const addresses = ["factory", "hook", "locker"].map((key) => deployed[key].toLowerCase());
+  assert.equal(new Set(addresses).size, 3, "two of the deployed addresses are the same");
 });
 
 test("a mistyped address fails its checksum rather than pointing somewhere real", () => {

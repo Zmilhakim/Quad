@@ -343,11 +343,20 @@ back has to break a test rather than a promise.
 The EVM has to be Cancun or later: v4 keeps its lock and its deltas in transient
 storage.
 
-## Not deployed, and not audited
+## Deployed, and not audited
 
-`quadpad.config.json` has no addresses under `deployed` because nothing has been
-deployed. None of this is audited. What the scripts do instead is check what can
-be checked before spending gas: that the RPC really is the chain the config
+On Robinhood Chain since 19 September 2026, from the deployer the config names,
+at its first nonce:
+
+| | |
+| --- | --- |
+| Factory | `0x4A5C4578470E17eB287483b4CEc90d6082bb901a` |
+| Hook | `0x490Dcc9e85Bc775C4dD4A1444dB57FD4089b20CC` |
+| Locker | `0xF258eC8Ca9f8896cE320cb16E7C0300fA4D2c3bB` |
+
+All three are under `deployed` in `quadpad.config.json`, written there by
+`deploy.mjs` after it read them back off the chain. None of it is audited. What
+the scripts do instead is check what can be checked before spending gas: that the RPC really is the chain the config
 names, that the pool manager answers like one, that the key signing is the
 address the config expects, and — after deploying — that the hook landed on a
 flagged address and holds the treasury that was asked for. `launch.mjs` simulates
