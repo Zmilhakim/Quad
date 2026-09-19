@@ -41,10 +41,30 @@ console.log(`deployer   ${account.address}`);
 console.log(`balance    ${formatEther(balance)} ETH`);
 console.log(`manager    ${poolManager}`);
 
+// A second router is not dangerous — it holds nothing, and the old one keeps
+// working — but it is not free either: it costs gas, it leaves the config
+// pointing somewhere the site is not, and the swap script and the site then
+// disagree about which contract a trade goes through. So replacing a recorded
+// router takes saying so, rather than re-running the same line.
 if (config.deployed?.router) {
   console.log(`\nexisting   ${config.deployed.router} is already recorded as the router.`);
-  console.log(`           Deploying again replaces it in the config. The old one keeps`);
-  console.log(`           working — it has no state and nothing points at it.`);
+
+  if (process.env.REPLACE !== "yes") {
+    fail(
+      "there is already a router, and this would deploy a second one.",
+      "",
+      "Nothing was sent. The recorded one works — it has no state to go stale and",
+      "no owner to lose. Deploy another only if this checkout builds a different",
+      "QuadRouter than the one on chain, and then say so:",
+      "",
+      "    REPLACE=yes CONFIRM=deploy-router npm run deploy-router",
+      "",
+      "The site reads its own copy of this address, so a replacement means",
+      "redeploying the site too.",
+    );
+  }
+
+  console.log(`           REPLACE=yes — deploying another and recording that one instead.`);
 }
 
 const bytecode = `0x${routerArtifact.evm.bytecode.object}`;

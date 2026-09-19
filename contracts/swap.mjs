@@ -119,6 +119,7 @@ if (buying) {
     functionName: "buy",
     args: [key, minOut, deadline],
     value: spend,
+    quotable: true,
     line: `ID=${id} BUY=${shellQuote(process.env.BUY)} CONFIRM=swap npm run swap`,
   };
 } else {
@@ -175,26 +176,35 @@ if (buying) {
     functionName: "sell",
     args: [key, amount, minOut, deadline],
     value: 0n,
+    quotable,
     line: `ID=${id} SELL=${shellQuote(process.env.SELL)} CONFIRM=swap npm run swap`,
   };
 }
 
-try {
-  const [gas, gasPrice] = await Promise.all([
-    publicClient.estimateContractGas({
-      address: router,
-      abi: routerArtifact.abi,
-      functionName: plan.functionName,
-      args: plan.args,
-      account,
-      value: plan.value,
-    }),
-    publicClient.getGasPrice(),
-  ]);
-  console.log(`\ngas        ${gas.toLocaleString("en-US")} at ${formatGwei(gasPrice)} gwei`);
-  console.log(`cost       about ${formatEther(gas * gasPrice)} ETH on top`);
-} catch (error) {
-  console.log(`\ngas        could not be estimated: ${error.shortMessage ?? error.message?.split("\n")[0] ?? error}`);
+// Without the allowance the sell cannot be simulated, and neither can its gas.
+// Asking anyway comes back as a raw ERC-20 revert, which reads like something
+// is wrong when the only thing missing is the approve this script sends first.
+if (!plan.quotable) {
+  console.log(`\ngas        not estimated yet — the approve goes in first, and it is the`);
+  console.log(`           allowance the pool is waiting on, nothing else`);
+} else {
+  try {
+    const [gas, gasPrice] = await Promise.all([
+      publicClient.estimateContractGas({
+        address: router,
+        abi: routerArtifact.abi,
+        functionName: plan.functionName,
+        args: plan.args,
+        account,
+        value: plan.value,
+      }),
+      publicClient.getGasPrice(),
+    ]);
+    console.log(`\ngas        ${gas.toLocaleString("en-US")} at ${formatGwei(gasPrice)} gwei`);
+    console.log(`cost       about ${formatEther(gas * gasPrice)} ETH on top`);
+  } catch (error) {
+    console.log(`\ngas        could not be estimated: ${error.shortMessage ?? error.message?.split("\n")[0] ?? error}`);
+  }
 }
 
 if (process.env.CONFIRM !== "swap") {
