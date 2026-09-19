@@ -67,13 +67,26 @@ for (const notice of page) {
   console.log(`  price    ${formatEther(ethPerTokenFromSqrtPrice(slot0.sqrtPriceX96))} ETH per token`);
   console.log(`  in pool  ${formatEther(held.eth)} ETH, ${(held.tokens / 10n ** 18n).toLocaleString("en-US")} tokens unsold`);
 
-  const owedToCreator = await publicClient.readContract({
-    address: hook,
-    abi: hookArtifact.abi,
-    functionName: "owed",
-    args: [notice.creator, "0x0000000000000000000000000000000000000000"],
-  });
-  console.log(`  unclaimed ${formatEther(owedToCreator)} ETH waiting for the creator`);
+  // Both sides of it. A buy pays its fee in ETH and a sell pays it in the
+  // token, so a creator whose launch has only been sold is owed nothing in ETH
+  // — and a line that reported ETH alone would have said they had earned
+  // nothing at all.
+  const [ethOwed, tokenOwed] = await Promise.all(
+    ["0x0000000000000000000000000000000000000000", notice.token].map((currency) =>
+      publicClient.readContract({
+        address: hook,
+        abi: hookArtifact.abi,
+        functionName: "owed",
+        args: [notice.creator, currency],
+      }),
+    ),
+  );
+
+  const claims = [
+    `${formatEther(ethOwed)} ETH`,
+    ...(tokenOwed > 0n ? [`${formatEther(tokenOwed)} $${notice.symbol}`] : []),
+  ];
+  console.log(`  unclaimed ${claims.join(", ")} waiting for the creator`);
 }
 
 // ETH in the pool starting at zero is correct rather than broken: a launch opens
