@@ -84,16 +84,39 @@ The LP position goes to a contract with no function that gives it back. That is 
 
 Image: `out/launch-1600x900.png`
 
-Send the launch transaction first, then post this with the token's real
-address in it. Not before: an address posted ahead of the transaction is an
-address somebody else can deploy to on another chain.
+Sent on 19 September 2026. `$QUAD` is
+`0x2564a46B9b5B3f9b55fd6f3F862b37d54BEac047`, notice #1 on the board, and the
+address matched what the dry run predicted.
 
 ```
 $QUAD is live.
 
-<token address>
+0x2564a46B9b5B3f9b55fd6f3F862b37d54BEac047
 
 It opened at 1.7 ETH, like everything else on the board, because the contract cannot open it anywhere else. 4% of every swap, 80% of that to whoever launched it.
+
+quadpad.fun/board
+```
+
+### 6 — the thing that is now demonstrable
+
+This one could not be posted before tonight, because it needed two tokens.
+
+`$QZERO` and `$QUAD` were launched hours apart, by different transactions, and
+the pool manager recorded the same opening price for both — to the last digit:
+
+```
+0.000000001700080239 ETH per token
+```
+
+```
+Two tokens, launched hours apart, in two different transactions.
+
+The pool manager recorded the same opening price for both, to the last digit:
+
+0.000000001700080239 ETH per token
+
+Not a convention, not a default anyone followed. There is no argument in launch() that could have made them differ.
 
 quadpad.fun/board
 ```
