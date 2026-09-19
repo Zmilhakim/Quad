@@ -71,7 +71,7 @@ const input = {
   settings: {
     optimizer: { enabled: true, runs: 200 },
     evmVersion: "cancun",
-    outputSelection: { "*": { "*": ["abi", "evm.bytecode.object", "evm.deployedBytecode.object"] } },
+    outputSelection: { "*": { "*": ["abi", "evm.bytecode.object", "evm.deployedBytecode.object", "metadata"] } },
   },
 };
 
@@ -149,6 +149,47 @@ for (const [file, name] of Object.entries(DEPLOYED)) {
 
 writeFileSync(join(outDir, "solc-input.json"), JSON.stringify(standalone, null, 2));
 
+// One input per contract, holding only the sources that contract actually
+// compiles from. An explorer is happy with the whole thing, but the whole thing
+// is 390KB and it is uploaded once per contract, over whatever connection the
+// person verifying happens to have. A contract's metadata lists its own import
+// closure and nothing else, and the metadata hash is part of the deployed
+// bytecode — so trimming to that closure cannot change what is produced.
+//
+// Cannot, but is checked anyway: each trimmed input is compiled and compared to
+// the artifact above, and a mismatch stops the build rather than being found
+// out at submission.
+const verifyDir = join(outDir, "verify");
+mkdirSync(verifyDir, { recursive: true });
+
+for (const [file, name] of Object.entries(DEPLOYED)) {
+  const needed = Object.keys(JSON.parse(output.contracts[file][name].metadata).sources);
+  const trimmed = {
+    ...input,
+    sources: Object.fromEntries(needed.map((path) => [path, standalone.sources[path]])),
+  };
+
+  const built = JSON.parse(solc.compile(JSON.stringify(trimmed)));
+  const errors = (built.errors ?? []).filter((d) => d.severity === "error");
+  if (errors.length > 0) {
+    for (const d of errors) console.error(d.formattedMessage.trimEnd());
+    console.error(`\n${name}: its own sources do not compile on their own`);
+    process.exit(1);
+  }
+
+  if (built.contracts?.[file]?.[name]?.evm?.deployedBytecode?.object !== output.contracts[file][name].evm.deployedBytecode.object) {
+    console.error(`${name}: the trimmed input compiles to different bytecode — do not submit it`);
+    process.exit(1);
+  }
+
+  writeFileSync(join(verifyDir, `${name}.json`), JSON.stringify(trimmed, null, 2));
+}
+
 console.log(`\nartifacts written to ${outDir}`);
 console.log(`ABIs written to ${abiDir}`);
 console.log(`verification input written, ${Object.keys(standalone.sources).length} sources, bytecode matches`);
+for (const name of Object.values(DEPLOYED)) {
+  const path = join(verifyDir, `${name}.json`);
+  const size = (readFileSync(path).length / 1024).toFixed(0);
+  console.log(`  out/verify/${name}.json`.padEnd(34) + `${String(size).padStart(4)} KB, same bytecode`);
+}

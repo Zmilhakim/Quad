@@ -1,14 +1,14 @@
-// Everything an explorer asks for when verifying the three deployed contracts,
-// worked out from the record rather than typed in. Sends nothing, reads no
-// chain, needs no key.
+// Everything an explorer asks for when verifying the deployed contracts, worked
+// out from the record rather than typed in. Sends nothing, reads no chain,
+// needs no key.
 //
 // Verification is not decoration here. The pinned post says the contracts can
 // be read, and the site says the locker has no withdraw in it — both are claims
 // about source nobody can see until this is done, because an unverified address
 // shows bytecode and nothing else.
 //
-// The awkward part of verifying this deployment is that only one of the three
-// addresses was deployed by a person. The factory deploys the hook with CREATE2
+// The awkward part of verifying this deployment is that half the addresses were
+// not deployed by a person. The factory deploys the hook with CREATE2
 // in its own constructor, and the locker with an ordinary CREATE right after,
 // so their constructor arguments were never typed anywhere — they have to be
 // reconstructed. That is what this does, and it checks each reconstruction
@@ -172,6 +172,16 @@ if (config.deployed?.router) {
   });
 }
 
+/** The size of a contract's own input, for choosing what to upload. */
+function fileNote(name) {
+  try {
+    const path = join(here, "out", "verify", `${name}.json`);
+    return `   (${(readFileSync(path).length / 1024).toFixed(0)} KB)`;
+  } catch {
+    return "";
+  }
+}
+
 const inputPath = join(here, "out", "solc-input.json");
 let input;
 try {
@@ -190,13 +200,15 @@ console.log(`Verify at an explorer that takes a Solidity standard JSON input.\n`
 console.log(`compiler       ${solcVersion}`);
 console.log(`optimization   ${optimizer.enabled ? `enabled, ${optimizer.runs} runs` : "disabled"}`);
 console.log(`evm version    ${evmVersion}`);
-console.log(`json file      contracts/out/solc-input.json   (${Object.keys(input.sources).length} sources, no imports to resolve)`);
+console.log(`json file      one per contract, below — each holds only that contract's own sources`);
+console.log(`               (contracts/out/solc-input.json has all ${Object.keys(input.sources).length} at once, if an explorer prefers it)`);
 console.log(`license        MIT`);
 
 for (const contract of CONTRACTS) {
   console.log(`\n${contract.name}`);
   console.log(`  address      ${contract.address}`);
   console.log(`  contract     ${contract.source}:${contract.name}`);
+  console.log(`  json file    contracts/out/verify/${contract.name}.json${fileNote(contract.name)}`);
   console.log(`  ${contract.how}`);
   for (const [label, value] of contract.args) console.log(`  arg          ${label} = ${value}`);
   console.log(`  constructor arguments, ABI-encoded:`);
