@@ -369,3 +369,37 @@ names, that the pool manager answers like one, that the key signing is the
 address the config expects, and — after deploying — that the hook landed on a
 flagged address and holds the treasury that was asked for. `launch.mjs` simulates
 the whole transaction against the node before it will broadcast.
+
+## Verifying what is on the chain
+
+Nothing above can be read by anyone until the three addresses are verified. An
+unverified contract shows bytecode, and "the locker has no withdraw in it" is
+not a claim anybody should take on trust — it is a claim that can be checked,
+once the source is up.
+
+`npm run compile` already writes `out/solc-input.json`: the whole compilation
+with every import inlined, which it then compiles a second time and compares
+against the artifacts it just wrote, because an input that produces different
+bytecode is rejected at submission and that is a slow way to find a mistake.
+That file is what an explorer wants under "Solidity (Standard JSON input)".
+
+`npm run verify` prints the rest of the form. It sends nothing and reads no
+chain:
+
+```
+npm run compile
+npm run verify
+```
+
+The awkward part is that only one of the three contracts was deployed by a
+person. The factory deploys the hook with CREATE2 in its own constructor and the
+locker with an ordinary CREATE straight after, so neither one's constructor
+arguments were ever typed anywhere — they have to be reconstructed. `verify.mjs`
+reconstructs all three and checks each against `quadpad.config.json` before
+printing it: the nonce that reproduces the recorded factory, the salt that
+reproduces the recorded hook, the factory's own nonce that reproduces the
+recorded locker. A mismatch is a failure there rather than a rejection later,
+and the likeliest cause is a checkout that no longer builds what was deployed.
+
+That makes it a test as well as a form-filler, so it is one: the suite runs it
+and fails if any recorded address stops being reproducible.

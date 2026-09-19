@@ -125,7 +125,7 @@ test("every script still resolves what it imports", () => {
   // nothing noticed: the contract tests do not load the scripts, and a syntax
   // check does not resolve imports. Every one of these would have thrown
   // "does not provide an export named 'configAddress'" on the first real run.
-  for (const script of ["deploy.mjs", "launch.mjs", "collect.mjs", "status.mjs", "mine.mjs", "whoami.mjs"]) {
+  for (const script of ["deploy.mjs", "launch.mjs", "collect.mjs", "status.mjs", "mine.mjs", "whoami.mjs", "verify.mjs"]) {
     const run = spawnSync(
       process.execPath,
       ["--input-type=module", "-e", `await import(${JSON.stringify(join(root, script))});`],
@@ -137,5 +137,21 @@ test("every script still resolves what it imports", () => {
       /does not provide an export|Cannot find module/,
       `${script} does not resolve its imports:\n${run.stderr}`,
     );
+  }
+});
+
+test("the verification input is for the contracts that were deployed", () => {
+  // `verify.mjs` reconstructs what was never written down — the factory's
+  // nonce, the hook's salt, the locker's nonce — and refuses to print anything
+  // that does not reproduce the address in the config. So running it is a check
+  // on the deployment as much as a way to fill in an explorer's form: it fails
+  // if the checkout no longer builds the hook that is on the chain.
+  const run = spawnSync(process.execPath, [join(root, "verify.mjs")], { cwd: root, encoding: "utf8" });
+
+  assert.equal(run.status, 0, `verify.mjs failed:\n${run.stderr}`);
+
+  const config = loadConfig();
+  for (const address of Object.values(config.deployed)) {
+    assert.ok(run.stdout.includes(address), `verify.mjs did not account for ${address}`);
   }
 });

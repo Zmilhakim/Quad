@@ -14,7 +14,8 @@
     "deploy": "node deploy.mjs",
     "launch": "node launch.mjs",
     "status": "node status.mjs",
-    "collect": "node collect.mjs"
+    "collect": "node collect.mjs",
+    "verify": "node verify.mjs"
   },
   "license": "MIT",
   "dependencies": {
