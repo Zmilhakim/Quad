@@ -5,7 +5,7 @@ import "./globals.css";
 import { Providers } from "@/providers";
 import { SiteHeader } from "@/components/chrome/SiteHeader";
 import { SiteFooter } from "@/components/chrome/SiteFooter";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, X_HANDLE } from "@/lib/site";
 
 const archivo = Archivo_Black({ weight: "400", subsets: ["latin"], variable: "--font-archivo", display: "swap" });
 
@@ -32,6 +32,11 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
+    // So a shared link is attributed to the account in the post itself, which
+    // is one more place the real handle appears without anyone having to look
+    // it up.
+    site: `@${X_HANDLE}`,
+    creator: `@${X_HANDLE}`,
     title: "Quadpad — every launch opens at 1.7 ETH",
     description,
     images: ["/brand/og-1200x630.png"],

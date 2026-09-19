@@ -20,22 +20,16 @@ Alternatives: `Quadpad` (7) · `Quadpad | opens at 1.7 ETH` (26) · `Quadpad —
 
 ## Handle
 
-Nothing here is registered yet, and this file will say so until it is. Check
-these in order and write down which one you took, with the date — a handle
-somebody else holds can be pointed at anything, and the only defence is that the
-real one is written somewhere people can check:
+**`@Quadpadxyz`** — https://x.com/Quadpadxyz — registered 19 September 2026.
 
-1. `@quadpad`
-2. `@getquadpad`
-3. `@quadpad_xyz`
+That is the only one. Anything else calling itself Quadpad is not Quadpad,
+whatever it posts and whatever it links to. The defence against an impersonator
+is not vigilance, it is this line existing somewhere they cannot edit, written
+down before it was needed: the site footer links to it, and the repository says
+it here.
 
-`@hoodpad` was taken when Hoodpad went looking, which is the ordinary outcome
-rather than the unlucky one. Assume the short one is gone and be glad if it is
-not.
-
-Whichever one you take, come back and write it here with the date. The reason is
-in the first paragraph: the handle nobody wrote down is the one an impersonator
-gets to claim was the real one.
+None of `@quadpad`, `@getquadpad` or `@quadpad_xyz` is ours. If one of them
+appears later posting Quadpad contracts, it is somebody else.
 
 ## Bio — max 160
 

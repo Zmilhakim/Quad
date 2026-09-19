@@ -4,6 +4,7 @@ import { ROBINHOOD_CHAIN_ID } from "@/lib/chain";
 import { BOARD_IS_OPEN, FACTORY_ADDRESS } from "@/lib/contracts";
 import { explorerAddress } from "@/lib/chain";
 import { shortAddress } from "@/lib/format";
+import { X_HANDLE, X_URL } from "@/lib/site";
 
 export function SiteFooter() {
   return (
@@ -26,6 +27,15 @@ export function SiteFooter() {
         ) : (
           <span className="micro text-lane-faint">Not deployed yet</span>
         )}
+
+        <a
+          className="micro text-lane-soft underline decoration-signal/50 underline-offset-4 hover:text-signal"
+          href={X_URL}
+          target="_blank"
+          rel="noreferrer"
+        >
+          @{X_HANDLE} ↗
+        </a>
 
         <Link className="micro ml-auto text-lane-soft hover:text-signal" href="/learn">
           What this does not promise
