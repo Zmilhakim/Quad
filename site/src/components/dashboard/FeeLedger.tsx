@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import type { Address } from "viem";
-import { useConnection, useReadContracts, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import { useConnection, useReadContracts, useSwitchChain, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 
 import { Badge } from "@/components/ui/Badge";
 import { Button, buttonClasses } from "@/components/ui/Button";
@@ -25,7 +25,15 @@ import { formatEth, formatTokenAmount } from "@/lib/format";
  * list would have shown it nothing while it was owed something.
  */
 export function FeeLedger({ hook, notices }: { hook: Address | undefined; notices: readonly Notice[] }) {
-  const { address, isConnected } = useConnection();
+  const { address, chainId, isConnected } = useConnection();
+  const { switchChain, isPending: isSwitching } = useSwitchChain();
+
+  // The claim is readable from any chain — the reads are pinned to Robinhood
+  // Chain — but the withdrawal is a transaction, and a wallet pointed at
+  // another chain cannot send it. Pressing Collect while it is elsewhere used
+  // to return the raw mismatch from wagmi, which reads like the collection
+  // failed rather than never having been attempted.
+  const wrongChain = isConnected && chainId !== ROBINHOOD_CHAIN_ID;
 
   // Native ETH first — it is the one every buy pays in — then every token on
   // the board, which is what sells pay in. Rows worth nothing are dropped
@@ -105,9 +113,21 @@ export function FeeLedger({ hook, notices }: { hook: Address | undefined; notice
           </dl>
 
           <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-signal/20 pt-4">
-            <Button onClick={collect} disabled={isPending || receipt.isLoading}>
-              {isPending ? "Confirm in wallet…" : receipt.isLoading ? "Collecting…" : "Collect all"}
-            </Button>
+            {wrongChain ? (
+              <Button onClick={() => switchChain({ chainId: ROBINHOOD_CHAIN_ID })} disabled={isSwitching}>
+                {isSwitching ? "Confirm in wallet…" : `Switch to Robinhood Chain`}
+              </Button>
+            ) : (
+              <Button onClick={collect} disabled={isPending || receipt.isLoading}>
+                {isPending ? "Confirm in wallet…" : receipt.isLoading ? "Collecting…" : "Collect all"}
+              </Button>
+            )}
+
+            {wrongChain && (
+              <span className="micro text-lane-soft">
+                This is owed on Robinhood Chain ({ROBINHOOD_CHAIN_ID}); your wallet is on another one.
+              </span>
+            )}
             {receipt.isSuccess && (
               <button className="micro text-lane-soft underline underline-offset-4" onClick={() => refetch()}>
                 Collected — refresh
