@@ -150,7 +150,7 @@ people pay for supply is locked — for the creator as much as for anyone.
 | The opening price and the range | So every launch starts where every other one did, and nobody has to ask |
 
 A creator chooses the name, the ticker, the picture and the words. That is the
-whole list — shorter than Tollpad's by the one entry that mattered. There is no
+whole list — shorter than Toollpad's by the one entry that mattered. There is no
 allocation, no vesting and no cliff, because there is nowhere to put one.
 
 ## The two keys
@@ -168,7 +168,7 @@ only a *changed* one between mining and sending is, and `deploy.mjs` mines it
 itself to make that impossible.
 
 **Treasury.** Receives 20% of every fee, forever, and is an `immutable` in the
-hook. There is no setter under any spelling. It is **not** the address Tollpad
+hook. There is no setter under any spelling. It is **not** the address Toollpad
 pays — `configAddress` refuses that one by name, because the two configs are one
 directory apart and identical in shape, which is exactly how a copy-paste
 nobody re-reads becomes permanent. `deploy.mjs` reads it back off the
@@ -203,15 +203,15 @@ keep that promise in a config file.
 
 ### Quadpad's two addresses are Quadpad's own
 
-They are **not** Tollpad's, and that is enforced rather than asked for. An
-earlier commit carried Tollpad's two over wholesale with a note saying to change
+They are **not** Toollpad's, and that is enforced rather than asked for. An
+earlier commit carried Toollpad's two over wholesale with a note saying to change
 them before deploying — and a note is not a check. `configAddress` refuses
 either of them outright, in any spelling, and `test/config.test.mjs` asserts
 both that and the fact that the two addresses above are distinct from each
 other:
 
 ```
-treasury is Tollpad's treasury: 0xb1A81E4A729c87560eF12d7652D883e803C5422E
+treasury is Toollpad's treasury: 0xb1A81E4A729c87560eF12d7652D883e803C5422E
 
 Quadpad deploys with its own two addresses. Generate them on the computer
 you sit in front of — `node new-wallets.mjs`, which refuses to run on a
@@ -253,7 +253,7 @@ cross-check.
 
 ## Every launch opens at the same price
 
-This is the one thing Quadpad has that Hoodpad and Tollpad do not, and it is a
+This is the one thing Quadpad has that Hoodpad and Toollpad do not, and it is a
 property of the factory rather than a convention anybody follows.
 
 On the other two, the price range is a launch parameter. Two tokens posted on

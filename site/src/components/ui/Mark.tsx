@@ -5,7 +5,7 @@ import { MARK_GRID, MARK_SIZE } from "@/lib/markGrid";
  *
  * The grid is generated from `brand/lib/marks.mjs` — the same array the logo
  * SVGs are drawn from — so the mark in the header cannot drift from the mark on
- * the banner. Tollpad's equivalent is a hand-typed duplicate with a comment
+ * the banner. Toollpad's equivalent is a hand-typed duplicate with a comment
  * asking whoever edits one to remember the other.
  *
  * It is drawn rather than loaded because an `<img>` cannot be tinted: the mark

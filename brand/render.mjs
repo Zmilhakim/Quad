@@ -91,7 +91,7 @@ async function inlineFonts() {
 
 const FONTS = await inlineFonts();
 
-// The sheet is ruled like drafting paper rather than textured like Tollpad's
+// The sheet is ruled like drafting paper rather than textured like Toollpad's
 // asphalt: this launchpad's whole claim is that every launch is the same
 // measured thing, and a grid is what measured things get drawn on.
 const BASE = `
@@ -368,7 +368,7 @@ rmSync(tmp, { recursive: true, force: true });
 
 // --- what the site gets ------------------------------------------------------
 // The app carries its own copy of the mark, because a header has to tint it with
-// CSS and an <img> cannot be recoloured. Tollpad's equivalent is a hand-typed
+// CSS and an <img> cannot be recoloured. Toollpad's equivalent is a hand-typed
 // duplicate of the grid with a comment asking whoever edits one to remember the
 // other; this one is written from the same array the SVGs are drawn from, so
 // there is nothing to remember.

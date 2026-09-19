@@ -16,11 +16,11 @@ yet.
 
 ## The shape
 
-Quadpad is Tollpad's shape with different numbers and one addition. The supply
-and the lock work the way they do in the rest of the Hood family — Hoodpad,
-CRATE and Tollpad, in
-[Zmilhakim/Hood-asset](https://github.com/Zmilhakim/Hood-asset): the whole
-supply is minted at launch, all of it opens a single-sided pool, and the position
+Quadpad is Toollpad's shape with different numbers and one addition. The supply
+and the lock work the way they do in the rest of the Hood family — Hoodpad and
+CRATE in [Zmilhakim/Hood-asset](https://github.com/Zmilhakim/Hood-asset),
+Toollpad in [Zmilhakim/toollpad](https://github.com/Zmilhakim/toollpad): the
+whole supply is minted at launch, all of it opens a single-sided pool, and the position
 goes into a contract with no way to take it back. Trading fees stay claimable by
 whoever launched the token; the liquidity does not.
 
@@ -35,7 +35,7 @@ whoever launched the token; the liquidity does not.
 
 ## The addition is the last row
 
-On Hoodpad and Tollpad, whoever posts a notice chooses the tick the pool opens
+On Hoodpad and Toollpad, whoever posts a notice chooses the tick the pool opens
 at. Two launches on the same afternoon can be priced an order of magnitude apart,
 and a buyer has to work out which is which before they can read either chart.
 
@@ -88,7 +88,7 @@ simply started, which is the order it was meant to happen in.
 ## Before it can be deployed
 
 `contracts/quadpad.config.json` carries Quadpad's own two addresses — not
-Tollpad's:
+Toollpad's:
 
 | | |
 | --- | --- |
@@ -101,7 +101,7 @@ hosted or shared machine: a private key is only secret while it has existed in
 exactly one place, and a container somebody else can read is not that place. The
 keys reach the scripts through `DEPLOYER_KEY` in a shell, one session at a time.
 
-An earlier commit carried Tollpad's two addresses over with a note asking
+An earlier commit carried Toollpad's two addresses over with a note asking
 whoever deployed to change them. `configAddress` now refuses both by name, in
 any spelling, and `contracts/test/config.test.mjs` asserts that — and that these
 two are distinct from each other — because the treasury becomes an `immutable`

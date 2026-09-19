@@ -7,7 +7,7 @@
  * liquidity figure the pool manager reports into the two numbers worth showing
  * — the ETH locked into a pool, and the supply still unsold.
  *
- * Tollpad's copy of this file also prices a launch, because there the range is
+ * Toollpad's copy of this file also prices a launch, because there the range is
  * an argument and the browser has to work it out before sending the
  * transaction. Here it is three constants in the factory and `launch` takes no
  * price at all, so that half of the file went with it.

@@ -39,18 +39,18 @@ function resolve(path, envName, value) {
 const TOLLPAD_TREASURY = "0xb1A81E4A729c87560eF12d7652D883e803C5422E";
 const TOLLPAD_DEPLOYER = "0xF914569f6207Bd87f8568b770eC7166788fD7B72";
 
-test("Tollpad's treasury is refused, however it is spelled", () => {
+test("Toollpad's treasury is refused, however it is spelled", () => {
   for (const spelling of [TOLLPAD_TREASURY, TOLLPAD_TREASURY.toLowerCase()]) {
     const result = resolve("treasury", "TREASURY", spelling);
     assert.equal(result.ok, false, `${spelling} was accepted as Quadpad's treasury`);
-    assert.match(result.why, /Tollpad's treasury/);
+    assert.match(result.why, /Toollpad's treasury/);
   }
 });
 
-test("Tollpad's deployer is refused too", () => {
+test("Toollpad's deployer is refused too", () => {
   const result = resolve("deployer", "DEPLOYER", TOLLPAD_DEPLOYER);
-  assert.equal(result.ok, false, "Tollpad's deployer was accepted");
-  assert.match(result.why, /Tollpad's deployer/);
+  assert.equal(result.ok, false, "Toollpad's deployer was accepted");
+  assert.match(result.why, /Toollpad's deployer/);
 });
 
 test("an address of Quadpad's own is accepted", () => {
@@ -63,7 +63,7 @@ test("the committed config carries two addresses, and they are Quadpad's", () =>
   const config = loadConfig();
 
   // Both are set, both resolve, and — the point of all of this — neither is
-  // the address Tollpad pays. `configAddress` returns them checksummed, and
+  // the address Toollpad pays. `configAddress` returns them checksummed, and
   // the file holds them in exactly that form, so a diff of this file is a
   // review of the real value rather than of a spelling of it.
   for (const path of ["treasury", "deployer"]) {
@@ -91,7 +91,7 @@ test("an address the config does not have is refused, not defaulted", () => {
 });
 
 test("a mistyped address fails its checksum rather than pointing somewhere real", () => {
-  // Tollpad's treasury with its last character changed: still 42 characters of
+  // Toollpad's treasury with its last character changed: still 42 characters of
   // hex, still an address by shape, and not one anybody meant to type. This is
   // also what stops the guard above being sidestepped by a typo.
   const result = resolve("treasury", "TREASURY", `${TOLLPAD_TREASURY.slice(0, -1)}F`);

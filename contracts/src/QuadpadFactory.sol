@@ -34,7 +34,7 @@ import {QuadToken} from "./QuadToken.sol";
 /// ## Every launch opens at the same price
 ///
 /// This is the one thing Quadpad has that the other launchpads in this
-/// repository do not. On Hoodpad and Tollpad the price range is a launch
+/// repository do not. On Hoodpad and Toollpad the price range is a launch
 /// parameter, so two tokens posted on the same afternoon can open an order of
 /// magnitude apart and a buyer has to work out which is which before they can
 /// read either chart. Here the range is not a parameter. It is
@@ -62,7 +62,7 @@ import {QuadToken} from "./QuadToken.sol";
 /// ## What a creator controls
 ///
 /// The name, the ticker, the picture and the words. That is the whole list —
-/// shorter than Tollpad's by the one entry that mattered. There is no
+/// shorter than Toollpad's by the one entry that mattered. There is no
 /// allocation, no vesting schedule, no unlock cliff and no treasury carve-out,
 /// because there is nowhere to put one: the supply has exactly one destination
 /// and it is the pool.
@@ -86,7 +86,7 @@ contract QuadpadFactory {
         uint128 liquidity;
     }
 
-    /// @dev Metadata, and nothing else. Tollpad's equivalent carries a tick
+    /// @dev Metadata, and nothing else. Toollpad's equivalent carries a tick
     /// spacing, an opening `sqrtPriceX96` and both ends of the range; the whole
     /// point of this launchpad is that those are not things a caller gets to
     /// say.

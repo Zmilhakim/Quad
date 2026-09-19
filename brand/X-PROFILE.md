@@ -4,7 +4,7 @@ Everything needed to set the account up, in the fields X asks for. Character
 counts were measured, not estimated; X counts Unicode code points, and the em
 dash counts as one.
 
-The account is in English and stays in English. Tollpad ships both languages
+The account is in English and stays in English. Toollpad ships both languages
 because it was written for both; mixing them on one profile reads like a bio
 somebody else wrote.
 
@@ -68,8 +68,8 @@ launchpad on its first day, which is the day the bio gets written.
 
 ## The claims in this bio are checkable
 
-Tollpad's bio makes two claims — 5% and 80% — and both are constants with no
-setter in `TollHook.sol`, so anyone can go and read them. Every claim in the bios
+Toollpad's bio makes two claims — 5% and 80% — and both are constants with no
+setter in its hook, so anyone can go and read them. Every claim in the bios
 above is the same kind of thing:
 
 | The bio says | Read it in |

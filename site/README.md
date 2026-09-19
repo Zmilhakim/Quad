@@ -51,7 +51,7 @@ The board uses it to turn a position's liquidity into the two figures worth
 showing: the ETH locked in and the supply still unsold.
 
 The launch form does not use it at all, and that is the interesting part. On
-Tollpad the form prices a range before sending the transaction, because the
+Toollpad the form prices a range before sending the transaction, because the
 range is an argument. Here `OPENING_TICK`, `TICK_LOWER` and `TICK_SPACING` are
 constants in the factory and `launch` takes no price argument, so there is
 nothing for the browser to compute — and no version of this form, or any other

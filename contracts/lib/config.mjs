@@ -66,7 +66,7 @@ export function saveConfig(config) {
 const at = (config, path) => path.split(".").reduce((node, key) => node?.[key], config);
 
 /**
- * The addresses Tollpad deploys with.
+ * The addresses Toollpad deploys with.
  *
  * Quadpad is a different launchpad and pays a different treasury, but the two
  * configs are one directory apart and identical in shape, so the way this goes
@@ -122,7 +122,7 @@ export function configAddress(config, path, envName, { what }) {
   const borrowed = Object.entries(TOLLPADS).find(([, other]) => getAddress(other) === address);
   if (borrowed) {
     fail(
-      `${path} is Tollpad's ${borrowed[0]}: ${address}`,
+      `${path} is Toollpad's ${borrowed[0]}: ${address}`,
       "",
       "Quadpad deploys with its own two addresses. Generate them on the computer",
       "you sit in front of — `node new-wallets.mjs`, which refuses to run on a",

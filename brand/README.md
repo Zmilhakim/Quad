@@ -57,7 +57,7 @@ leaves open on the left — which is structural, so it survives the size.
 
 ## The sheet, not the road
 
-Tollpad is asphalt and hazard stripes, because a toll is a thing you pay at a
+Toollpad is asphalt and hazard stripes, because a toll is a thing you pay at a
 barrier. Quadpad is ruled paper, because its claim is that every launch is the
 same measured thing: one rate, one supply, one opening price. The grid is the
 whole texture, and it is drawn in CSS rather than shipped as an image.
@@ -74,10 +74,9 @@ exactly there. The check is what found it.
 
 ## The numbers are checked against the contracts
 
-Tollpad's `render.mjs` reads `TOLL_BPS`, `CREATOR_BPS`, `LP_FEE` and
-`FIXED_SUPPLY` out of `../contracts/src/` and throws if they are not what the
-copy says — a card printing *5%* is a claim about deployed code, and it is worth
-exactly as much as the check behind it.
+Toollpad's renderer reads its rates straight out of its own contract sources and
+throws if they are not what the copy says — a card printing *5%* is a claim
+about deployed code, and it is worth exactly as much as the check behind it.
 
 This one does the same, and a little more, because it has one more claim to
 make. [`numbers.mjs`](numbers.mjs) holds the figures:
@@ -133,7 +132,7 @@ banner, the OG image and the lockup into `public/brand/`, the favicon into
 
 The last one is the point. The site cannot use an `<img>` for the mark in its
 header — an image cannot be tinted, and the mark has to take the colour of
-whatever it sits on — so it needs the shape, not a file. Tollpad's app solves
+whatever it sits on — so it needs the shape, not a file. Toollpad's app solves
 that by keeping a hand-typed duplicate of the grid with a comment asking whoever
 edits one to remember the other. This one is written from the same array the
 SVGs are drawn from, so there is nothing to remember.
