@@ -141,6 +141,37 @@ const CONTRACTS = [
   },
 ];
 
+// The router is deployed separately and may not exist yet. When it does, it is
+// an ordinary CREATE from the deployer like the factory, so the same search
+// finds the nonce it went out at.
+if (config.deployed?.router) {
+  const router = configAddress(config, "deployed.router", "ROUTER", { what: "the deployed QuadRouter" });
+
+  let routerNonce = -1;
+  for (let i = 0; i < NONCE_LIMIT; i++) {
+    if (getAddress(predictFactory({ deployer, nonce: i })) === router) {
+      routerNonce = i;
+      break;
+    }
+  }
+  if (routerNonce < 0) {
+    fail(
+      `${router} is not an address ${deployer} can have deployed in its first ${NONCE_LIMIT} transactions.`,
+      "",
+      "The recorded router belongs to some other account than the deployer in the config.",
+    );
+  }
+
+  CONTRACTS.push({
+    name: "QuadRouter",
+    address: router,
+    source: "QuadRouter.sol",
+    args: [["IPoolManager poolManager_", poolManager]],
+    encoded: encode("address", [poolManager]),
+    how: `deployed by ${deployer} at nonce ${routerNonce}`,
+  });
+}
+
 const inputPath = join(here, "out", "solc-input.json");
 let input;
 try {

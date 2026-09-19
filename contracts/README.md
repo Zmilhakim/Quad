@@ -370,6 +370,49 @@ address the config expects, and — after deploying — that the hook landed on 
 flagged address and holds the treasury that was asked for. `launch.mjs` simulates
 the whole transaction against the node before it will broadcast.
 
+## Trading it
+
+A launched token is not buyable by a person. A v4 pool has no `swap` a wallet
+can call: the pool manager only opens for a contract that answers
+`unlockCallback`, and it settles in deltas rather than transfers. So `QuadRouter`
+is not a convenience on top of the launchpad — without it every token on the
+board is unbuyable, and the 4% the whole thing is built around is never charged
+once.
+
+It is deployed separately from the factory, and deliberately. The factory, the
+hook and the locker are the launchpad, and they are immutable; the router is a
+window onto them. It holds nothing, has no owner, no pause and no fee of its
+own, and could be replaced tomorrow by a better one without touching a pool. Its
+whole ABI is five functions, which is the argument: `buy`, `buyExactTokens`,
+`sell`, `poolManager`, `unlockCallback`. There is nothing in it that moves an
+asset anywhere but to the account that asked.
+
+What it does add is the two things a swap against a thin pool needs:
+
+  * **A limit.** Every entry point takes the worst result its caller will accept
+    and reverts rather than settling outside it. There is no unlimited-slippage
+    call in the file.
+  * **A deadline.** A swap that sits unmined until the price has moved is a swap
+    at a price nobody agreed to.
+
+```
+CONFIRM=deploy-router npm run deploy-router   # once, per chain
+ID=0 BUY=0.001 npm run swap                   # prints the plan, sends nothing
+ID=0 BUY=0.001 CONFIRM=swap npm run swap      # sends it
+ID=0 SELL=all npm run swap
+```
+
+`swap.mjs` quotes the swap against the node with no limit on it, applies
+`SLIPPAGE_BPS` (1% by default) to what came back, and sends *that* number as the
+limit — so the transaction that goes out is the one that was read, not a repeat
+of it. Selling needs an ERC-20 allowance, which goes out as its own transaction
+first; the script says so before it does it.
+
+The tests trade through this router as well as through the bare one the rest of
+the suite uses. The bare one has no limits in it, which is what makes it good
+for measuring the hook; this one is what a person actually gets, so its limits,
+its deadline and the fact that it keeps nothing are tested on the way through.
+
 ## Verifying what is on the chain
 
 Nothing above can be read by anyone until the three addresses are verified. An

@@ -91,6 +91,7 @@ const DEPLOYED = {
   "QuadpadFactory.sol": "QuadpadFactory",
   "QuadHook.sol": "QuadHook",
   "QuadLocker.sol": "QuadLocker",
+  "QuadRouter.sol": "QuadRouter",
   "QuadToken.sol": "QuadToken",
 };
 

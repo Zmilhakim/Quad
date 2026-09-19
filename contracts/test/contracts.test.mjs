@@ -33,6 +33,7 @@ const lockerArtifact = artifact("QuadLocker");
 const tokenArtifact = artifact("QuadToken");
 const managerArtifact = artifact("TestPoolManager");
 const routerArtifact = artifact("TestSwapRouter");
+const quadRouterArtifact = artifact("QuadRouter");
 
 const SUPPLY = 1_000_000_000n * 10n ** 18n;
 const NAME = "Quad Test";
@@ -96,6 +97,20 @@ const LAUNCH_PARAMS = {
   link: "https://example.invalid",
 };
 
+/** The smallest block header the EVM will read a timestamp out of. */
+const blockAt = (timestamp) => ({
+  header: {
+    timestamp,
+    number: 1n,
+    gasLimit: GAS,
+    baseFeePerGas: 0n,
+    difficulty: 0n,
+    prevRandao: new Uint8Array(32),
+    coinbase: OWNER,
+    getBlobGasPrice: () => 0n,
+  },
+});
+
 async function fresh() {
   // Cancun or later: the pool manager keeps its lock and its deltas in transient
   // storage, so anything older cannot run it at all.
@@ -114,13 +129,16 @@ async function fresh() {
     return getAddress(result.createdAddress.toString());
   };
 
-  const call = async (to, abi, functionName, args = [], { caller = OWNER, value = 0n } = {}) => {
+  const call = async (to, abi, functionName, args = [], { caller = OWNER, value = 0n, timestamp } = {}) => {
     const result = await evm.runCall({
       caller,
       to: new Address(hexToBytes(to)),
       data: hexToBytes(encodeFunctionData({ abi, functionName, args })),
       gasLimit: GAS,
       value,
+      // Without a block the EVM reports a timestamp of zero, which no deadline
+      // can be behind. Anything that has an opinion about the clock passes one.
+      ...(timestamp === undefined ? {} : { block: blockAt(timestamp) }),
     });
     return {
       reverted: result.execResult.exceptionError !== undefined,
@@ -174,8 +192,12 @@ async function venue() {
   const hook = await ctx.read(factory, factoryArtifact.abi, "hook");
   const locker = await ctx.read(factory, factoryArtifact.abi, "locker");
   const router = await ctx.deploy(routerArtifact, "address", [manager], OWNER);
+  // The router that ships. The tests above trade through the bare one, which
+  // has no limits in it, so that what they measure is the hook; these trade
+  // through the one real traders get.
+  const quadRouter = await ctx.deploy(quadRouterArtifact, "address", [manager], OWNER);
 
-  return { ...ctx, manager, factory, hook, locker, router, salt: mined.salt };
+  return { ...ctx, manager, factory, hook, locker, router, quadRouter, salt: mined.salt };
 }
 
 async function launch(ctx, params = LAUNCH_PARAMS, caller = CREATOR) {
@@ -649,4 +671,150 @@ test("the hook cannot be deployed anywhere but a flagged address", async () => {
     gasLimit: GAS,
   });
   assert.notEqual(result.execResult.exceptionError, undefined, "a factory with an unmined salt deployed anyway");
+});
+
+// ---------------------------------------------------------------- the router
+
+// A launched token cannot be traded by a person at all: the pool manager only
+// opens for a contract that answers `unlockCallback`. So the router is not a
+// convenience on top of the launchpad — until it exists, every token on the
+// board is unbuyable, and the fee the whole thing is built around is never
+// charged once.
+
+const FAR_FUTURE = 4_000_000_000n;
+
+const routerBuy = (ctx, key, ethIn, { minOut = 0n, deadline = FAR_FUTURE, caller = TRADER, timestamp } = {}) =>
+  ctx.call(ctx.quadRouter, quadRouterArtifact.abi, "buy", [key, minOut, deadline], { caller, value: ethIn, timestamp });
+
+const routerBuyExact = (ctx, key, tokensOut, budget, { deadline = FAR_FUTURE, caller = TRADER } = {}) =>
+  ctx.call(ctx.quadRouter, quadRouterArtifact.abi, "buyExactTokens", [key, tokensOut, deadline], {
+    caller,
+    value: budget,
+  });
+
+async function routerSell(ctx, key, token, tokensIn, { minOut = 0n, deadline = FAR_FUTURE, caller = TRADER } = {}) {
+  const approved = await ctx.call(token, tokenArtifact.abi, "approve", [ctx.quadRouter, tokensIn], { caller });
+  assert.equal(approved.reverted, false, "approve reverted");
+
+  return ctx.call(ctx.quadRouter, quadRouterArtifact.abi, "sell", [key, tokensIn, minOut, deadline], { caller });
+}
+
+test("a buy through the router charges the same 4%, and the router keeps none of it", async () => {
+  const ctx = await venue();
+  const { key, token } = await launch(ctx);
+
+  const spend = 2n * ETH;
+  const bought = await routerBuy(ctx, key, spend);
+  assert.equal(bought.reverted, false, "the buy reverted");
+
+  const fee = (spend * 400n) / 10_000n;
+  assert.equal(await owed(ctx, address(CREATOR), NATIVE), (fee * 8000n) / 10_000n);
+  assert.equal(await owed(ctx, address(TREASURY), NATIVE), fee - (fee * 8000n) / 10_000n);
+
+  // The tokens went to the trader, not to the contract that did the swapping.
+  assert.ok((await ctx.read(token, tokenArtifact.abi, "balanceOf", [address(TRADER)])) > 0n);
+  assert.equal(await ctx.read(token, tokenArtifact.abi, "balanceOf", [ctx.quadRouter]), 0n);
+
+  // And nothing is left behind for the next caller to sweep.
+  assert.equal(await ctx.balanceOf(ctx.quadRouter), 0n);
+  assert.equal(await ctx.balanceOf(address(TRADER)), 10_000n * ETH - spend);
+});
+
+test("a buy that would deliver less than asked reverts rather than settling", async () => {
+  const ctx = await venue();
+  const { key } = await launch(ctx);
+
+  const honest = await routerBuy(ctx, key, ETH);
+  assert.equal(honest.reverted, false);
+  const delivered = await owed(ctx, address(CREATOR), NATIVE);
+
+  // Ask for more tokens than that ETH can possibly buy.
+  const greedy = await routerBuy(ctx, key, ETH, { minOut: SUPPLY });
+  assert.equal(greedy.reverted, true, "a buy under its own limit went through");
+
+  // A revert unwinds the swap as well as the transfer: no fee was banked, and
+  // the trader still holds the ETH they offered.
+  assert.equal(await owed(ctx, address(CREATOR), NATIVE), delivered);
+  assert.equal(await ctx.balanceOf(address(TRADER)), 10_000n * ETH - ETH);
+});
+
+test("a sell through the router needs one approval and pays out in ETH", async () => {
+  const ctx = await venue();
+  const { key, token } = await launch(ctx);
+
+  assert.equal((await routerBuy(ctx, key, ETH)).reverted, false);
+  const held = await ctx.read(token, tokenArtifact.abi, "balanceOf", [address(TRADER)]);
+
+  const before = await ctx.balanceOf(address(TRADER));
+  const sold = await routerSell(ctx, key, token, held / 2n);
+  assert.equal(sold.reverted, false, "the sell reverted");
+
+  const fee = ((held / 2n) * 400n) / 10_000n;
+  assert.equal(await owed(ctx, address(CREATOR), token), (fee * 8000n) / 10_000n);
+
+  // The ETH reached the seller, and the router is empty again.
+  assert.ok((await ctx.balanceOf(address(TRADER))) > before, "the sell paid nothing out");
+  assert.equal(await ctx.balanceOf(ctx.quadRouter), 0n);
+});
+
+test("a sell that would fetch less than asked reverts", async () => {
+  const ctx = await venue();
+  const { key, token } = await launch(ctx);
+
+  assert.equal((await routerBuy(ctx, key, ETH)).reverted, false);
+  const held = await ctx.read(token, tokenArtifact.abi, "balanceOf", [address(TRADER)]);
+
+  const sold = await routerSell(ctx, key, token, held / 2n, { minOut: 1_000n * ETH });
+  assert.equal(sold.reverted, true, "a sell under its own limit went through");
+  assert.equal(await ctx.read(token, tokenArtifact.abi, "balanceOf", [address(TRADER)]), held);
+});
+
+test("an exact-output buy sends the change back", async () => {
+  const ctx = await venue();
+  const { key, token } = await launch(ctx);
+
+  const want = 1_000_000n * 10n ** 18n;
+  const budget = 5n * ETH;
+
+  const bought = await routerBuyExact(ctx, key, want, budget);
+  assert.equal(bought.reverted, false, "the exact-output buy reverted");
+
+  assert.equal(await ctx.read(token, tokenArtifact.abi, "balanceOf", [address(TRADER)]), want);
+
+  // What the trader is out is what the swap cost, not what they were willing to
+  // spend — the difference came back in the same transaction.
+  const spent = 10_000n * ETH - (await ctx.balanceOf(address(TRADER)));
+  assert.ok(spent > 0n && spent < budget, `the whole budget was kept: ${spent}`);
+  assert.equal(await ctx.balanceOf(ctx.quadRouter), 0n);
+
+  // The fee is still 4% of everything paid in, charged in `afterSwap` this time.
+  const fee = (spent * 400n) / 10_000n;
+  const banked = (await owed(ctx, address(CREATOR), NATIVE)) + (await owed(ctx, address(TREASURY), NATIVE));
+  assert.ok(banked > 0n, "an exact-output buy banked no fee at all");
+  assert.ok(fee - banked <= 1n && banked - fee <= 1n, `fee ${banked} is not 4% of ${spent} (${fee})`);
+});
+
+test("a swap that arrives after its deadline is refused", async () => {
+  const ctx = await venue();
+  const { key } = await launch(ctx);
+
+  const now = 1_000_000n;
+
+  const late = await routerBuy(ctx, key, ETH, { deadline: now - 1n, timestamp: now });
+  assert.equal(late.reverted, true, "a swap past its deadline went through");
+  assert.equal(await owed(ctx, address(CREATOR), NATIVE), 0n);
+
+  // The same swap one second inside the deadline, so the test above is about
+  // the clock rather than about anything else in the call.
+  const ontime = await routerBuy(ctx, key, ETH, { deadline: now, timestamp: now });
+  assert.equal(ontime.reverted, false, "a swap inside its deadline was refused");
+  assert.ok((await owed(ctx, address(CREATOR), NATIVE)) > 0n);
+});
+
+test("the router has nothing anyone can take out of it", async () => {
+  // No owner, no sweep, no withdraw: the ABI is the argument. If a way to move
+  // somebody else's money into this contract ever appears, it appears here.
+  const names = quadRouterArtifact.abi.filter((entry) => entry.type === "function").map((entry) => entry.name);
+
+  assert.deepEqual(names.sort(), ["buy", "buyExactTokens", "poolManager", "sell", "unlockCallback"]);
 });

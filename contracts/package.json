@@ -15,7 +15,9 @@
     "launch": "node launch.mjs",
     "status": "node status.mjs",
     "collect": "node collect.mjs",
-    "verify": "node verify.mjs"
+    "verify": "node verify.mjs",
+    "deploy-router": "node deploy-router.mjs",
+    "swap": "node swap.mjs"
   },
   "license": "MIT",
   "dependencies": {
