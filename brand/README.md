@@ -22,6 +22,7 @@ finds it).
 | `banner-1500x500.png` | X / Twitter header |
 | `og-1200x630.png` | Link previews |
 | `launch-1600x900.png` | The whole launch, as one card |
+| `live-1600x900.png` | Where the launchpad is: the five addresses, for a pinned post |
 
 ## The X account
 
@@ -36,6 +37,21 @@ against X's limits.
 Not `$HOOD` — that is Robinhood's NASDAQ ticker, and a token called `$HOOD`
 launching on Robinhood Chain reads as an official Robinhood asset to anyone
 skimming. Not `$PAD` either, which is every launchpad on every chain.
+
+## The address card is drawn from the record
+
+`live-1600x900.png` prints five addresses — factory, hook, locker, treasury,
+deployer — and they are the one thing on it a reader can check for themselves.
+So none of them is typed: `deployedAddresses()` in `numbers.mjs` reads the three
+contracts out of the `deployed` block `deploy.mjs` wrote after reading them back
+off the chain, and the two accounts out of the config they were chosen in. Empty
+any of them and the render throws rather than drawing a blank where an address
+should be.
+
+It checks shape and nothing else, deliberately. This kit cannot reach a node,
+and an address that is well-formed but wrong is not something local checking
+catches — what catches that is `deploy.mjs` asking the hook for its own treasury
+before it will write any of this down.
 
 ## The mark is the rate
 

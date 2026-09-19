@@ -11,7 +11,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { createRequire } from "node:module";
 
 import { FOUR, SIZE, fourBodySvg, fourSvg, lockupSvg, wordmarkSvg, PALETTE } from "./lib/marks.mjs";
-import { RATE, assertAgainstContracts } from "./numbers.mjs";
+import { RATE, assertAgainstContracts, deployedAddresses } from "./numbers.mjs";
 
 const require = createRequire(import.meta.url);
 const sharp = require("sharp");
@@ -36,6 +36,7 @@ export const BRAND = {
 // registered — see X-PROFILE.md.
 
 const CHECK = assertAgainstContracts();
+const LIVE = deployedAddresses();
 // ---------------------------------------------------------------------------
 
 mkdirSync(out, { recursive: true });
@@ -252,6 +253,63 @@ const launchCard = `<!doctype html><html><head><meta charset="utf-8">${FONTS}<st
   </div>
 </body></html>`;
 
+/**
+ * Where the launchpad is, drawn from the deploy record rather than typed.
+ *
+ * The addresses are the whole point of this card: they are the one thing on it
+ * a reader can check for themselves, and the one thing nobody can argue about
+ * afterwards. `deployedAddresses()` throws rather than returning a blank, so a
+ * card that would print an empty row never renders at all.
+ *
+ * Still no domain and no handle on it — see X-PROFILE.md. A post carries its
+ * link in its own text; an image repeating it is one more thing that can go
+ * stale.
+ */
+const liveCard = `<!doctype html><html><head><meta charset="utf-8">${FONTS}<style>${BASE}
+  body { width: 1600px; height: 900px; overflow: hidden; background: ${PALETTE.ink}; }
+  .frame { width: 1600px; height: 900px; padding: 50px; }
+  .panel { width: 100%; height: 100%; border: 4px solid ${PALETTE.signal}; display: flex; flex-direction: column; }
+  .addr { display: flex; align-items: baseline; gap: 22px; padding: 11px 0; border-bottom: 1px solid rgb(62 224 139 / .2); }
+  .addr:last-child { border-bottom: 0; }
+  .addr span { flex: 0 0 210px; font-size: 18px; letter-spacing: .1em; text-transform: uppercase; color: ${PALETTE.inkFaint}; }
+  .addr b { font-size: 24px; font-weight: 600; color: ${PALETTE.paper}; letter-spacing: -.01em; }
+  .addr i { font-size: 16px; font-style: normal; color: ${PALETTE.inkFaint}; }
+</style></head><body>
+  <div class="frame sheet-bg">
+    <div class="panel">
+      <div style="display:flex;justify-content:space-between;background:${PALETTE.signal};color:${PALETTE.ink};padding:15px 34px;font-size:17px;font-weight:600;letter-spacing:.18em">
+        <span>LIVE ON ${BRAND.chain}</span>
+        <span>${BRAND.ticker}</span>
+      </div>
+
+      <div style="flex:1;min-height:0;display:flex;align-items:center;gap:48px;padding:24px 48px">
+        <div style="flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:16px">
+          ${fourSvg({ size: 190 })}
+          <div class="display" style="font-size:56px;line-height:1;color:${PALETTE.signal}">${RATE.marketCap}</div>
+          <div class="micro" style="font-size:14px;text-align:center">EVERY LAUNCH<br/>OPENS HERE</div>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div class="addr"><span>Factory</span><div><b>${LIVE.factory}</b><br/><i>the board — anyone can post to it</i></div></div>
+          <div class="addr"><span>Hook</span><div><b>${LIVE.hook}</b><br/><i>${RATE.fee} of every swap, ${RATE.creator} of it to the launcher</i></div></div>
+          <div class="addr"><span>Locker</span><div><b>${LIVE.locker}</b><br/><i>holds the liquidity, and has no way to give it back</i></div></div>
+          <div class="addr"><span>Treasury</span><div><b>${LIVE.treasury}</b><br/><i>the other ${RATE.treasury} — an immutable in the hook, no setter</i></div></div>
+          <div class="addr"><span>Deployer</span><div><b>${LIVE.deployer}</b><br/><i>signed the deployment, and owns nothing here — there is no owner</i></div></div>
+        </div>
+      </div>
+
+      <div style="padding:22px 48px;border-top:3px solid ${PALETTE.signal};background:${PALETTE.groundDeep}">
+        <div style="font-size:20px;line-height:1.55;color:${PALETTE.paper};max-width:96ch">
+          Read them rather than take this card's word for it. Open the locker and search it for a withdraw, a collect, or a negative liquidity delta — there is none. Open the hook and read ${RATE.fee} and ${RATE.creator} as constants with no setter. Not audited.
+        </div>
+        <div style="margin-top:14px;display:flex;justify-content:space-between;align-items:center">
+          <span class="micro" style="color:${PALETTE.signal};font-weight:600">SUPPLY ${RATE.supply}, ALL OF IT IN THE POOL</span>
+          <span class="micro" style="color:${PALETTE.signal};font-weight:600">${BRAND.venue}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</body></html>`;
+
 // --- vector marks -----------------------------------------------------------
 writeFileSync(join(out, "logo-mark.svg"), fourSvg({ size: 512 }));
 writeFileSync(join(out, "logo-wordmark.svg"), wordmarkSvg({ unit: 12 }));
@@ -296,6 +354,7 @@ for (const { name, html, size, faces, reserved } of [
   { name: "banner-1500x500", html: banner, size: { width: 1500, height: 500 }, faces: ["IBM Plex Mono"], reserved: AVATAR_ZONE },
   { name: "og-1200x630", html: og, size: { width: 1200, height: 630 }, faces: ["Archivo Black", "IBM Plex Mono"] },
   { name: "launch-1600x900", html: launchCard, size: { width: 1600, height: 900 }, faces: ["Archivo Black", "IBM Plex Mono"] },
+  { name: "live-1600x900", html: liveCard, size: { width: 1600, height: 900 }, faces: ["Archivo Black", "IBM Plex Mono"] },
 ]) {
   // Written to disk and opened over file:// — setContent leaves the base URL at
   // about:blank, where a relative or remote font is never fetched at all.

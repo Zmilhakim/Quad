@@ -15,6 +15,7 @@ import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const contracts = join(here, "..", "contracts", "src");
+const configPath = join(here, "..", "contracts", "quadpad.config.json");
 
 export const SPEC = {
   /** 4% of everything paid into the pool, in either direction. */
@@ -169,6 +170,50 @@ function constantFrom(file, name) {
   if (!match) throw new Error(`${file} no longer declares ${name} — the cards cannot state a rate it does not have`);
   return BigInt(match[1].replaceAll("_", "")) * 10n ** BigInt(match[2] ?? 0);
 }
+
+/**
+ * Where the launchpad actually is, read out of the deploy record.
+ *
+ * A card printing a contract address is the one thing on it a reader can check
+ * and nobody can argue with — which only holds if the card cannot print an
+ * address the project does not have. So these come from the file `deploy.mjs`
+ * wrote after reading them back off the chain, and a card that wants them
+ * throws rather than drawing a blank where an address should be.
+ *
+ * Addresses are checked for shape here and nothing more: this file cannot reach
+ * a node, and an address that is well-formed but wrong is not a thing any
+ * amount of local checking catches. What catches that is `deploy.mjs` reading
+ * the hook back and asking it for its own treasury before it will write any of
+ * this down.
+ */
+export function deployedAddresses() {
+  if (!existsSync(configPath)) throw new Error(`no ${configPath} — nothing to read a deployment out of`);
+
+  const config = JSON.parse(readFileSync(configPath, "utf8"));
+  const found = {};
+
+  // The three contracts live under `deployed`, written by deploy.mjs after it
+  // read them back off the chain. The two accounts are top-level: they were
+  // chosen before any of it existed.
+  for (const [key, source] of [
+    ["factory", config.deployed],
+    ["hook", config.deployed],
+    ["locker", config.deployed],
+    ["treasury", config],
+    ["deployer", config],
+  ]) {
+    const value = (source?.[key] ?? "").trim();
+    if (!/^0x[0-9a-fA-F]{40}$/.test(value)) {
+      throw new Error(`quadpad.config.json has no ${key} — a card cannot say where something is not`);
+    }
+    found[key] = value;
+  }
+
+  return found;
+}
+
+/** Long enough to be unmistakable, short enough to fit on a card. */
+export const shortAddress = (address) => `${address.slice(0, 10)}…${address.slice(-8)}`;
 
 /**
  * Holds the art to the contracts, once there are contracts.
