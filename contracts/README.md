@@ -247,8 +247,9 @@ deployment record,
 
 That is the only venue address a launch needs. v4 holds every pool in one
 manager, and the other side is native ETH, so there is no factory, no position
-manager and no WETH to record — the three things the v3 launchpad in this
-repository has to name and cross-check.
+manager and no WETH to record — the three things Hoodpad, the v3 launchpad in
+[Hood-asset](https://github.com/Zmilhakim/Hood-asset), has to name and
+cross-check.
 
 ## Every launch opens at the same price
 

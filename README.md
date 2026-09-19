@@ -13,7 +13,9 @@ brand/      logo, avatar, banner, OG image and launch card, all generated
 ## The shape
 
 Quadpad is Tollpad's shape with different numbers and one addition. The supply
-and the lock work the way they do everywhere else in this repository: the whole
+and the lock work the way they do in the rest of the Hood family — Hoodpad,
+CRATE and Tollpad, in
+[Zmilhakim/Hood-asset](https://github.com/Zmilhakim/Hood-asset): the whole
 supply is minted at launch, all of it opens a single-sided pool, and the position
 goes into a contract with no way to take it back. Trading fees stay claimable by
 whoever launched the token; the liquidity does not.
@@ -67,8 +69,8 @@ enough to make that untrue.
 
 ## The brand came first
 
-Unusually for this repository, `brand/` was written before `contracts/`, because
-it is cheap to change and the contracts are not. A launchpad's rate, its split
+Unusually for a launchpad in this family, `brand/` was written before
+`contracts/`, because it is cheap to change and the contracts are not. A launchpad's rate, its split
 and its supply are the whole of what it says about itself, and writing them as
 copy first is a fast way to find out whether they say anything.
 

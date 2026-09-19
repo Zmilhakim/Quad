@@ -75,7 +75,7 @@ There is no Vercel project, no URL and no custom domain for Quadpad yet, and
 this file will say so until there is. Tollpad's equivalent section names a live
 deployment because there is one; copying that text across would have been the
 same mistake as printing a domain on a banner before it is registered, which
-this repository has made once already.
+Hoodpad did once already.
 
 `SITE_URL` already follows `VERCEL_PROJECT_PRODUCTION_URL`, so the OG tags will
 point at whatever host the first deployment lands on without an edit. Set
