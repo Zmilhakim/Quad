@@ -17,7 +17,8 @@
     "collect": "node collect.mjs",
     "verify": "node verify.mjs",
     "deploy-router": "node deploy-router.mjs",
-    "swap": "node swap.mjs"
+    "swap": "node swap.mjs",
+    "watch": "node watch.mjs"
   },
   "license": "MIT",
   "dependencies": {

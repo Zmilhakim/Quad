@@ -125,7 +125,7 @@ test("every script still resolves what it imports", () => {
   // nothing noticed: the contract tests do not load the scripts, and a syntax
   // check does not resolve imports. Every one of these would have thrown
   // "does not provide an export named 'configAddress'" on the first real run.
-  for (const script of ["deploy.mjs", "launch.mjs", "collect.mjs", "status.mjs", "mine.mjs", "whoami.mjs", "verify.mjs", "deploy-router.mjs", "swap.mjs"]) {
+  for (const script of ["deploy.mjs", "launch.mjs", "collect.mjs", "status.mjs", "mine.mjs", "whoami.mjs", "verify.mjs", "deploy-router.mjs", "swap.mjs", "watch.mjs"]) {
     const run = spawnSync(
       process.execPath,
       ["--input-type=module", "-e", `await import(${JSON.stringify(join(root, script))});`],
