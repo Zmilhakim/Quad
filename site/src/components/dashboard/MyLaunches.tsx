@@ -7,7 +7,7 @@ import { LaunchCard } from "@/components/board/LaunchCard";
 import { FeeLedger } from "./FeeLedger";
 import { buttonClasses } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { useNoticesOf, usePoolStates, useQuadpad } from "@/lib/board";
+import { useNotices, useNoticesOf, usePoolStates, useQuadpad } from "@/lib/board";
 import { BOARD_IS_OPEN } from "@/lib/contracts";
 
 export function MyLaunches() {
@@ -15,6 +15,12 @@ export function MyLaunches() {
   const { hook } = useQuadpad();
   const { notices, isLoading } = useNoticesOf(address);
   const { states } = usePoolStates(notices, hook);
+
+  // The ledger asks about the whole board, not just this address's launches.
+  // A creator only ever earns in their own token, but the treasury earns 20% of
+  // every fee on every pool — and asking only about your own launches would
+  // show it an empty page while it was owed something.
+  const { notices: board } = useNotices();
 
   if (!BOARD_IS_OPEN) {
     return (
@@ -35,7 +41,7 @@ export function MyLaunches() {
 
   return (
     <div className="space-y-6">
-      <FeeLedger hook={hook} notices={notices} />
+      <FeeLedger hook={hook} notices={board} />
 
       {isLoading ? (
         <div className="grid gap-4 md:grid-cols-2">

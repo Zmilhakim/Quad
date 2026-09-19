@@ -18,12 +18,18 @@ import { formatEth, formatTokenAmount } from "@/lib/format";
  * one row of ETH rather than three — and `withdrawMany` settles the ETH and
  * every token in a single transaction. It pays the caller and nobody else:
  * there is no recipient argument to get wrong.
+ *
+ * `notices` is the whole board rather than the connected address's launches. A
+ * creator is only ever owed in their own token, so the difference is invisible
+ * to them; the treasury is owed 20% of every fee on every pool, and the shorter
+ * list would have shown it nothing while it was owed something.
  */
 export function FeeLedger({ hook, notices }: { hook: Address | undefined; notices: readonly Notice[] }) {
   const { address, isConnected } = useConnection();
 
-  // Native ETH first — it is the one every buy pays in — then each token this
-  // address launched, which is what its sells pay in.
+  // Native ETH first — it is the one every buy pays in — then every token on
+  // the board, which is what sells pay in. Rows worth nothing are dropped
+  // below, so a long board costs reads rather than clutter.
   const currencies = useMemo<Address[]>(
     () => [NATIVE, ...notices.map((notice) => notice.token)],
     [notices],
