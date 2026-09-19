@@ -11,9 +11,10 @@ brand/      logo, avatar, banner, OG image and launch card, all generated
 ```
 
 The app is live at **https://quadpad.fun**, built from `main`, and the
-contracts are on Robinhood Chain. The board is empty because nobody has
-launched anything yet — the site reads that from the chain rather than
-describing it.
+contracts are on Robinhood Chain. The first token, `$QZERO`, was launched on
+19 September 2026 and traded in both directions to prove the fee and the
+withdrawal on the real chain rather than in a test. Whatever the board says, it
+read from the chain rather than from here.
 
 ## The shape
 
@@ -66,6 +67,9 @@ enough to make that untrue.
 
 ## Where to start
 
+- [`LAUNCHING.md`](LAUNCHING.md) — launching a token, start to finish. The
+  numbers are not settings and there is nothing to configure per launch; this
+  is why, and what to do instead.
 - [`contracts/README.md`](contracts/README.md) — the mechanism, the four
   contracts, and how to deploy and launch.
 - [`site/README.md`](site/README.md) — running the app.
