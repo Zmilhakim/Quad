@@ -10,6 +10,10 @@ site/       the web app: landing, board, launch form, dashboard
 brand/      logo, avatar, banner, OG image and launch card, all generated
 ```
 
+The app is live at **https://quadpad-phi.vercel.app**, built from `main`. It
+reads an empty board and says so, because the contracts below are not deployed
+yet.
+
 ## The shape
 
 Quadpad is Tollpad's shape with different numbers and one addition. The supply

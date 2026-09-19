@@ -69,22 +69,33 @@ pictures and links that whoever launched a token put there. A picture is only
 ever rendered as an image and a creator's link carries `nofollow`, which is as
 far as a launchpad can honestly go.
 
-## Not deployed
+## Deployed
 
-There is no Vercel project, no URL and no custom domain for Quadpad yet, and
-this file will say so until there is. Tollpad's equivalent section names a live
-deployment because there is one; copying that text across would have been the
-same mistake as printing a domain on a banner before it is registered, which
-Hoodpad did once already.
+Live at **https://quadpad-phi.vercel.app**, from `main`.
 
-`SITE_URL` already follows `VERCEL_PROJECT_PRODUCTION_URL`, so the OG tags will
-point at whatever host the first deployment lands on without an edit. Set
-`NEXT_PUBLIC_SITE_URL` only if it ever needs to differ from that.
+| | |
+| --- | --- |
+| Vercel project | `quadpad`, in `zmilhakim-4557` |
+| Repository | [`Zmilhakim/Quad`](https://github.com/Zmilhakim/Quad) |
+| Root directory | `site` |
+| Production branch | `main` — every push deploys |
+| Protection | Vercel Authentication on previews only; production is public |
 
-Two things to do before it sees real traffic:
+The host is `quadpad-phi`, not `quadpad`, because `quadpad.vercel.app` was
+already taken by somebody else. Vercel picks a suffix rather than failing, and
+this file records what it picked — a URL nobody wrote down is a URL that gets
+guessed wrong later.
 
-- **`NEXT_PUBLIC_FACTORY_ADDRESS`**, once `npm run deploy` in `../contracts` has
-  printed one. Until then the site runs and says on every page that nothing is
-  deployed, which is the truth today.
-- **`NEXT_PUBLIC_RPC_URL`**. The default endpoint is Robinhood's public one and
-  is rate-limited for wallets, not for a site.
+What is still unset, on purpose: **`NEXT_PUBLIC_FACTORY_ADDRESS`**. There are no
+contracts on Robinhood Chain yet, so the live site says so on every page. Deploy
+them with `npm run deploy` in `../contracts`, set the variable in the project's
+environment, and redeploy — the pages turn on with no code change.
+
+Set **`NEXT_PUBLIC_RPC_URL`** before this sees any real traffic. The default
+endpoint is Robinhood's public one and is rate-limited for wallets, not for a
+site.
+
+There is no custom domain. `SITE_URL` follows `VERCEL_PROJECT_PRODUCTION_URL` by
+itself, so the OG tags already point at `quadpad-phi.vercel.app` and will follow
+a domain the moment one is attached — set `NEXT_PUBLIC_SITE_URL` only if it ever
+needs to differ from the production URL Vercel knows about.
