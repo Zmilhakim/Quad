@@ -9,6 +9,7 @@
   "deployed": {
     "factory": "0x4A5C4578470E17eB287483b4CEc90d6082bb901a",
     "hook": "0x490Dcc9e85Bc775C4dD4A1444dB57FD4089b20CC",
-    "locker": "0xF258eC8Ca9f8896cE320cb16E7C0300fA4D2c3bB"
+    "locker": "0xF258eC8Ca9f8896cE320cb16E7C0300fA4D2c3bB",
+    "router": "0xB5F0EC10C79cB2301faA0D6BBdbb884B869A9e14"
   }
 }

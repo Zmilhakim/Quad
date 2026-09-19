@@ -203,7 +203,8 @@ for (const contract of CONTRACTS) {
   console.log(`  ${contract.encoded}`);
 }
 
-console.log(`\nEvery address above was checked against quadpad.config.json before it was`);
-console.log(`printed: the nonce reproduces the factory, the salt reproduces the hook, and`);
-console.log(`the factory's own nonce reproduces the locker. The arguments are therefore the`);
-console.log(`ones that were used, not the ones that were meant to be.`);
+console.log(`\nAll ${CONTRACTS.length} were checked against quadpad.config.json before they were printed: the`);
+console.log(`nonce reproduces the factory, the salt reproduces the hook, the factory's own`);
+console.log(`nonce reproduces the locker${config.deployed?.router ? `, and the deployer's reproduces the router` : ``}.`);
+console.log(`The arguments are therefore the ones that were used, not the ones that were`);
+console.log(`meant to be.`);
