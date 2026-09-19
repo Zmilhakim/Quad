@@ -10,8 +10,8 @@ site/       the web app: landing, board, launch form, dashboard
 brand/      logo, avatar, banner, OG image and launch card, all generated
 ```
 
-The app is live at **https://quadpad-phi.vercel.app**, built from `main`, and
-the contracts are on Robinhood Chain. The board is empty because nobody has
+The app is live at **https://quadpad.fun**, built from `main`, and the
+contracts are on Robinhood Chain. The board is empty because nobody has
 launched anything yet — the site reads that from the chain rather than
 describing it.
 

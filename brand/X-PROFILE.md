@@ -118,13 +118,15 @@ says *backed by*, *worth* or *raised*, and none of them should start.
 ## Website
 
 ```
-https://quadpad-phi.vercel.app
+https://quadpad.fun
 ```
 
-That is the real site, built from `main` of this repository, and it reads the
-board off the chain. The host carries a suffix because `quadpad.vercel.app` was
-taken; if a domain is ever attached, change this field and nothing else — the
-site follows its own production URL without an edit.
+Registered, attached to the project and verified. It is the real site, built
+from `main` of this repository, and it reads the board off the chain.
+
+`quadpad-phi.vercel.app` still answers and always will — it is the project's
+own host, not a redirect anybody controls — but the domain is the one to put in
+front of people.
 
 Do not put a link to an explorer page in this field instead. It looks like a
 website, it is not one, and it goes stale the first time anything is

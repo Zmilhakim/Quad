@@ -75,7 +75,7 @@ far as a launchpad can honestly go.
 
 ## Deployed
 
-Live at **https://quadpad-phi.vercel.app**, from `main`.
+Live at **https://quadpad.fun**, from `main`.
 
 | | |
 | --- | --- |
@@ -85,10 +85,14 @@ Live at **https://quadpad-phi.vercel.app**, from `main`.
 | Production branch | `main` — every push deploys |
 | Protection | Vercel Authentication on previews only; production is public |
 
-The host is `quadpad-phi`, not `quadpad`, because `quadpad.vercel.app` was
-already taken by somebody else. Vercel picks a suffix rather than failing, and
-this file records what it picked — a URL nobody wrote down is a URL that gets
-guessed wrong later.
+`quadpad.fun` and `www.quadpad.fun` are both attached and verified, and the
+project keeps its own `quadpad-phi.vercel.app` as well — Vercel picked that
+suffix because `quadpad.vercel.app` was taken, and it goes on answering. Three
+hosts, one site.
+
+Neither custom host redirects to the other, so both serve. If one should be
+canonical, set the redirect on the other in the project's domain settings; the
+metadata below follows whichever Vercel reports as the production domain.
 
 **`NEXT_PUBLIC_FACTORY_ADDRESS`** is unset, and stays that way: the factory is
 in `src/lib/contracts.ts` instead, so a deployment cannot forget it. A variable
@@ -100,6 +104,8 @@ endpoint is Robinhood's public one and is rate-limited for wallets, not for a
 site.
 
 There is no custom domain. `SITE_URL` follows `VERCEL_PROJECT_PRODUCTION_URL` by
-itself, so the OG tags already point at `quadpad-phi.vercel.app` and will follow
-a domain the moment one is attached — set `NEXT_PUBLIC_SITE_URL` only if it ever
-needs to differ from the production URL Vercel knows about.
+itself, so the OG tags follow the production domain without an edit — they
+moved to `quadpad.fun` on the first build after it was attached, which is why
+attaching a domain is worth a redeploy rather than nothing. Set
+`NEXT_PUBLIC_SITE_URL` only if it ever needs to differ from the production URL
+Vercel knows about.
