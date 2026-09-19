@@ -33,6 +33,10 @@ real one is written somewhere people can check:
 rather than the unlucky one. Assume the short one is gone and be glad if it is
 not.
 
+Whichever one you take, come back and write it here with the date. The reason is
+in the first paragraph: the handle nobody wrote down is the one an impersonator
+gets to claim was the real one.
+
 ## Bio — max 160
 
 **Pick this** (132 characters):
@@ -113,9 +117,18 @@ says *backed by*, *worth* or *raised*, and none of them should start.
 
 ## Website
 
-Leave it empty until there is a domain, and then put the domain there. Do not
-put a link to an explorer page in this field: it looks like a website, it is not
-one, and it goes stale the first time anything is redeployed.
+```
+https://quadpad-phi.vercel.app
+```
+
+That is the real site, built from `main` of this repository, and it reads the
+board off the chain. The host carries a suffix because `quadpad.vercel.app` was
+taken; if a domain is ever attached, change this field and nothing else — the
+site follows its own production URL without an edit.
+
+Do not put a link to an explorer page in this field instead. It looks like a
+website, it is not one, and it goes stale the first time anything is
+redeployed.
 
 ## Images
 
