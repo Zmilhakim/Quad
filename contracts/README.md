@@ -351,24 +351,36 @@ back has to break a test rather than a promise.
 The EVM has to be Cancun or later: v4 keeps its lock and its deltas in transient
 storage.
 
-## Deployed, and not audited
+## Deployed, verified, and not audited
 
-On Robinhood Chain since 19 September 2026, from the deployer the config names,
-at its first nonce:
+On Robinhood Chain since 19 September 2026. All four are verified on
+Blockscout as an **exact match** — not merely the same bytecode, but the same
+metadata hash, which means the source published there is provably the source
+that was compiled and deployed.
 
-| | |
-| --- | --- |
-| Factory | `0x4A5C4578470E17eB287483b4CEc90d6082bb901a` |
-| Hook | `0x490Dcc9e85Bc775C4dD4A1444dB57FD4089b20CC` |
-| Locker | `0xF258eC8Ca9f8896cE320cb16E7C0300fA4D2c3bB` |
+| | | |
+| --- | --- | --- |
+| Factory | [`0x4A5C…901a`](https://robinhoodchain.blockscout.com/address/0x4A5C4578470E17eB287483b4CEc90d6082bb901a?tab=contract) | `launch()` with no price argument in it |
+| Hook | [`0x490D…20CC`](https://robinhoodchain.blockscout.com/address/0x490Dcc9e85Bc775C4dD4A1444dB57FD4089b20CC?tab=contract) | `FEE_BPS = 400`, constant, no setter |
+| Locker | [`0xF258…c3bB`](https://robinhoodchain.blockscout.com/address/0xF258eC8Ca9f8896cE320cb16E7C0300fA4D2c3bB?tab=contract) | no function that takes liquidity out |
+| Router | [`0xB5F0…9e14`](https://robinhoodchain.blockscout.com/address/0xB5F0EC10C79cB2301faA0D6BBdbb884B869A9e14?tab=contract) | five functions, no owner |
 
-All three are under `deployed` in `quadpad.config.json`, written there by
-`deploy.mjs` after it read them back off the chain. None of it is audited. What
+That table is the point of verifying at all: every claim in this repository
+about what the contracts cannot do is now a claim a reader can check without
+trusting the repository.
+
+All four are under `deployed` in `quadpad.config.json`, written there by the
+deploy scripts after reading them back off the chain. None of it is audited. What
 the scripts do instead is check what can be checked before spending gas: that the RPC really is the chain the config
 names, that the pool manager answers like one, that the key signing is the
 address the config expects, and — after deploying — that the hook landed on a
 flagged address and holds the treasury that was asked for. `launch.mjs` simulates
 the whole transaction against the node before it will broadcast.
+
+The first token, `$QZERO`, was launched on the same day and then bought and
+sold, to charge the fee in both directions on the real chain and take it out
+again — a launch, an ETH fee, a token fee, an 80/20 split and a withdrawal, all
+of them exercised on mainnet rather than only in the suite.
 
 ## Trading it
 
