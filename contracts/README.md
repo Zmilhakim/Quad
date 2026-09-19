@@ -318,6 +318,14 @@ NAME="Some Token" SYMBOL=SOME npm run launch                 # prints the plan, 
 NAME="Some Token" SYMBOL=SOME CONFIRM=launch npm run launch  # sends it
 ```
 
+The dry run also prices the transaction: it asks the node what the launch would
+cost in gas, at the price the node is quoting, and compares that with what the
+address holds. A launch deploys a token, opens a pool and mints a position into
+it in one transaction, so what the last one cost is a poor guide to what this
+one will — and a transaction that runs out of gas is still mined, the gas is
+still spent, and there is no token at the end. It refuses to go on if the
+balance cannot cover the estimate, and says so if it is close.
+
 **Do not chain these with `&&`.** A dry run is a success, so the first exits 0
 without sending anything and the next command in the chain runs against a launch
 that never happened.

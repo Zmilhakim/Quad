@@ -12,7 +12,7 @@
 // Do not chain these with `&&`. A dry run is a success, so the first command
 // exits 0 without sending anything and the next one in the chain would run
 // against a launch that never happened.
-import { createWalletClient, formatEther, http, parseEventLogs } from "viem";
+import { createWalletClient, formatEther, formatGwei, http, parseEventLogs } from "viem";
 
 import { configAddress, loadConfig } from "./lib/config.mjs";
 import { connect, fail, requireDeployerKey, requireEnv } from "./lib/env.mjs";
@@ -86,6 +86,56 @@ const { request, result } = await publicClient
 
 const [, token] = result;
 console.log(`\nwould deploy the token at ${token}`);
+
+/**
+ * What it will cost, before it is sent.
+ *
+ * A launch is one transaction that deploys a token, opens a pool and mints a
+ * position into it, so "is there enough for gas" is not a question worth
+ * guessing at from the size of the last one. The node knows; ask it.
+ *
+ * Estimating can fail for reasons that are not the launch's fault — a node that
+ * declines the call, or one that refuses to estimate for an account that cannot
+ * cover it. Neither is worth stopping a dry run over, so this reports what it
+ * could not work out rather than exiting.
+ */
+const balance = await publicClient.getBalance({ address: account.address });
+
+try {
+  const [gas, gasPrice] = await Promise.all([
+    publicClient.estimateContractGas({
+      address: factory,
+      abi: factoryArtifact.abi,
+      functionName: "launch",
+      args: [params],
+      account,
+    }),
+    publicClient.getGasPrice(),
+  ]);
+
+  // The wallet pays for the gas the transaction actually uses, but it has to
+  // hold the whole limit up front, and viem sends the estimate as the limit.
+  const cost = gas * gasPrice;
+  console.log(`\ngas        ${gas.toLocaleString("en-US")} at ${formatGwei(gasPrice)} gwei`);
+  console.log(`cost       about ${formatEther(cost)} ETH, of ${formatEther(balance)} ETH held`);
+
+  if (balance < cost) {
+    fail(
+      `this address holds ${formatEther(balance)} ETH and the launch needs about ${formatEther(cost)}.`,
+      "",
+      "Nothing was sent. Fund it and run this again — a transaction that runs out",
+      "of gas is mined, and the gas is spent, and there is no token at the end.",
+    );
+  }
+
+  if (balance < cost * 2n) {
+    console.log(`           that is under twice the estimate — top it up if the price moves`);
+  }
+} catch (error) {
+  console.log(`\ngas        could not be estimated: ${error.shortMessage ?? error.message?.split("\n")[0] ?? error}`);
+  console.log(`balance    ${formatEther(balance)} ETH`);
+  console.log(`           the simulation above still passed, so this is about the node, not the launch`);
+}
 
 if (process.env.CONFIRM !== "launch") {
   console.log(`\nNothing was sent. To send it:\n`);
